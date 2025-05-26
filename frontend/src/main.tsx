@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import App from './App';
 import Login from './pages/Login/Login';
-import Register from './pages/Register';
+import Register from './pages/Register/Register';
 import Capacitaciones from './pages/Capacitaciones';
 import ResponderEvaluacion from './pages/ResponderEvaluacion';
 import "./index.css"

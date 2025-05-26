@@ -37,7 +37,7 @@ export const AuroraBackground = ({
               "--blue-600": "#0284c7", // azul intenso
               "--indigo-900": "#1e3a8a", // índigo profundo
               "--violet-900": "#312e81", // púrpura azulado
-              "--midnight": "#0f172a",   // azul noche
+              "--midnight": "#0f172a",   // azul noche             //after:mix-blend-difference 
               "--black": "#0b1120",
               "--white": "#e0f2fe",
               "--transparent": "transparent",
@@ -49,7 +49,7 @@ export const AuroraBackground = ({
               `after:animate-aurora pointer-events-none absolute -inset-[10px]
               [background-image:var(--white-gradient),var(--aurora)]
               [background-size:300%,_200%] [background-position:50%_50%,50%_50%]
-              opacity-40 blur-[10px] filter will-change-transform
+              opacity-40 blur-[20px] filter will-change-transform
               [--aurora:repeating-linear-gradient(115deg,var(--sky-500)_10%,var(--blue-600)_20%,var(--indigo-900)_30%,var(--violet-900)_40%,var(--midnight)_50%)]
               [--dark-gradient:repeating-linear-gradient(115deg,var(--black)_0%,var(--black)_7%,var(--transparent)_10%,var(--transparent)_12%,var(--black)_16%)]
               [--white-gradient:repeating-linear-gradient(115deg,var(--white)_0%,var(--white)_7%,var(--transparent)_10%,var(--transparent)_12%,var(--white)_16%)]
@@ -57,7 +57,6 @@ export const AuroraBackground = ({
               after:[background-image:var(--white-gradient),var(--aurora)]
               after:[background-size:200%,_100%]
               after:[background-attachment:fixed]
-              after:mix-blend-difference
               after:content-[""]
               dark:[background-image:var(--dark-gradient),var(--aurora)]
               after:dark:[background-image:var(--dark-gradient),var(--aurora)]`,
@@ -65,7 +64,7 @@ export const AuroraBackground = ({
               showRadialGradient &&
                 `[mask-image:radial-gradient(ellipse_at_100%_0%,black_10%,var(--transparent)_70%)]`,
             )}
-          ></div>
+          ></div> 
         </div>
         {children}
       </div>

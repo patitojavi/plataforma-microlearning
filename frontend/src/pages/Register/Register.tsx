@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { login } from "../../services/auth";
+import { register } from "../../services/auth";
 import { CardContainer, CardBody, CardItem } from "../../components/ui/3d-card";
 import { AuroraBackground } from "../../components/ui/aurora-background";
 import { motion } from "framer-motion";
@@ -10,19 +10,22 @@ import { Label } from "../../components/ui/label";
 import { Input } from "../../components/ui/input";
 import { cn } from "../../lib/utils";
 
-export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+export default function Register() {
+  const [form, setForm] = useState({ email: "", username: "", rut: "", password: "" });
   const navigate = useNavigate();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await login({ email, password });
+      const res = await register(form);
       localStorage.setItem("token", res.token);
       navigate("/capacitaciones");
-    } catch {
-      alert("Credenciales inválidas");
+    } catch (err) {
+      alert("Error al registrar");
     }
   };
 
@@ -35,15 +38,16 @@ export default function Login() {
         className="relative flex flex-col items-center justify-center px-6 gap-8 max-w-xl mx-auto"
       >
         <h1 className="text-4xl md:text-5xl font-extrabold text-center max-w-md bg-gradient-to-r text-white bg-clip-text drop-shadow-lg leading-tight">
-          Bienvenido
+          Crear cuenta
         </h1>
+
         <CardContainer className="inter-var w-full z-10">
-          <CardBody className="bg-[#0f172a]/85 backdrop-blur-md border border-gray-400/30 rounded-xl px-8 py-14 shadow-md w-full max-w-2xl mx-auto overflow-visible min-h-[450px]">
+          <CardBody className="bg-[#0f172a]/85 backdrop-blur-md border border-gray-400/30 rounded-xl px-8 py-14 shadow-md w-full max-w-2xl mx-auto overflow-visible min-h-[600px]">
             <CardItem translateZ={50} className="text-3xl font-bold text-white select-none mb-8">
-              Iniciar sesión
+              Registro
             </CardItem>
 
-            <form onSubmit={handleLogin} className="flex flex-col space-y-5 w-full mx-auto">
+            <form onSubmit={handleRegister} className="flex flex-col space-y-5 w-full mx-auto">
               <CardItem translateZ={40} className="w-full flex flex-col">
                 <LabelInputContainer>
                   <Label htmlFor="email" className="text-white">
@@ -51,10 +55,47 @@ export default function Login() {
                   </Label>
                   <Input
                     id="email"
+                    name="email"
                     type="email"
                     placeholder="ejemplo@correo.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={form.email}
+                    onChange={handleChange}
+                    required
+                    className="bg-[#1e293b]/90 text-white placeholder-white"
+                  />
+                </LabelInputContainer>
+              </CardItem>
+
+              <CardItem translateZ={40} className="w-full flex flex-col">
+                <LabelInputContainer>
+                  <Label htmlFor="username" className="text-white">
+                    Nombre de usuario
+                  </Label>
+                  <Input
+                    id="username"
+                    name="username"
+                    type="text"
+                    placeholder="usuario"
+                    value={form.username}
+                    onChange={handleChange}
+                    required
+                    className="bg-[#1e293b]/90 text-white placeholder-white"
+                  />
+                </LabelInputContainer>
+              </CardItem>
+
+              <CardItem translateZ={40} className="w-full flex flex-col">
+                <LabelInputContainer>
+                  <Label htmlFor="rut" className="text-white">
+                    RUT
+                  </Label>
+                  <Input
+                    id="rut"
+                    name="rut"
+                    type="text"
+                    placeholder="12345678-9"
+                    value={form.rut}
+                    onChange={handleChange}
                     required
                     className="bg-[#1e293b]/90 text-white placeholder-white"
                   />
@@ -68,10 +109,11 @@ export default function Login() {
                   </Label>
                   <Input
                     id="password"
+                    name="password"
                     type="password"
                     placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={form.password}
+                    onChange={handleChange}
                     required
                     className="bg-[#1e293b]/90 text-white placeholder-white"
                   />
@@ -83,21 +125,14 @@ export default function Login() {
                   type="submit"
                   className="group/btn w-full rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 text-lg transition-all duration-300 relative"
                 >
-                  Entrar
+                  Registrarse
                   <BottomGradient />
                 </button>
               </CardItem>
 
               <CardItem translateZ={20} className="w-full flex flex-col text-center space-y-2 mt-4">
-                <Link to="/register" className="text-sm text-blue-400 hover:text-blue-600 transition">
-                  ¿No tienes cuenta? Regístrate aquí
-                </Link>
-                <Link
-                  to="#"
-                  className="text-sm text-blue-400 hover:text-blue-600 transition"
-                  onClick={(e) => e.preventDefault()}
-                >
-                  ¿Olvidaste tu contraseña?
+                <Link to="/login" className="text-sm text-blue-400 hover:text-blue-600 transition">
+                  ¿Ya tienes cuenta? <span className="underline">Inicia sesión</span>
                 </Link>
               </CardItem>
             </form>
@@ -108,7 +143,6 @@ export default function Login() {
   );
 }
 
-// Línea brillante debajo del botón
 const BottomGradient = () => (
   <>
     <span className="absolute inset-x-0 -bottom-px block h-px w-full bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-0 transition duration-500 group-hover/btn:opacity-100" />
@@ -116,7 +150,6 @@ const BottomGradient = () => (
   </>
 );
 
-// Contenedor para label + input con separación
 const LabelInputContainer = ({
   children,
   className,
@@ -124,9 +157,5 @@ const LabelInputContainer = ({
   children: React.ReactNode;
   className?: string;
 }) => {
-  return (
-    <div className={cn("flex w-full flex-col space-y-2", className)}>
-      {children}
-    </div>
-  );
+  return <div className={cn("flex w-full flex-col space-y-2", className)}>{children}</div>;
 };
