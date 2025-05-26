@@ -10,16 +10,19 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@heroui/navbar": "^2.2.17",
+    "@nextui-org/react": "^2.6.11",
     "@radix-ui/react-label": "^2.1.7",
     "@tabler/icons-react": "^3.33.0",
     "@tailwindcss/vite": "^4.1.7",
     "axios": "^1.9.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "framer-motion": "^12.12.2",
     "lucide-react": "^0.511.0",
+    "motion": "^12.14.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-icons": "^5.5.0",
     "react-router-dom": "^7.6.0",
     "tailwind-merge": "^3.3.0",
     "tailwindcss": "^4.1.7"
