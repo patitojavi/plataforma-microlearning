@@ -61,7 +61,7 @@ export default function AppNavbar() {
     <>
       {/* NAVBAR */}
       <Navbar
-        className="bg-[#0f172a]/90 text-white shadow-sm"
+        className="bg-indigo-950 text-white shadow-sm"
         isBordered
         onMenuOpenChange={setIsMenuOpen}
         style={{ minHeight: "64px" }} // Más alto que el default
