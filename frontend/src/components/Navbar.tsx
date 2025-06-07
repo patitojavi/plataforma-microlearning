@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   Navbar,
   NavbarBrand,
@@ -22,8 +22,9 @@ export default function AppNavbar() {
   const [isCuentaOpen, setIsCuentaOpen] = useState(false);
   const [isCuentaMobileOpen, setIsCuentaMobileOpen] = useState(false);
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
+  //const token = localStorage.getItem("token");
   const cuentaRef = useRef(null);
+  const role = localStorage.getItem("role");
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -46,11 +47,16 @@ export default function AppNavbar() {
   }, []);
 
   const menuItems = [
-    { name: "Inicio", path: "/" },
-    { name: "Capacitaciones", path: "/capacitaciones" },
-    { name: "Responder Evaluación", path: "/responder" },
+    { name: "Inicio", path: "/" }
   ];
 
+  if (role === 'admin') {
+    menuItems.push({ name: "Admin", path: "/admin" });
+    menuItems.push({ name: "Agregar Usuario", path: "/admin/agregar-usuario" });
+  } else if (role === 'usuario') {
+    menuItems.push({ name: "Capacitaciones", path: "/capacitaciones" });
+    menuItems.push({ name: "Responder Evaluación", path: "/responder" })
+  }
   return (
     <>
       {/* NAVBAR */}
@@ -70,30 +76,21 @@ export default function AppNavbar() {
           </button>
           <NavbarBrand className="ml-2 flex items-center">
             <AcmeLogo />
-            <span className="ml-2 font-semibold text-white text-base leading-none">
+            <NavLink
+              to="/"
+              onClick={() => setIsMenuOpen(false)}
+              className={({ isActive }) =>
+                `ml-2 font-semibold text-white text-base leading-none ${isActive ? "text-blue-400 " : ""
+                }`
+              }
+            >
               Microlearning
-            </span>
+            </NavLink>
           </NavbarBrand>
         </NavbarContent>
 
         {/* Desktop menu */}
-        <NavbarContent className="hidden sm:flex flex-1 items-center" justify="between">
-          {/* Grupo 1: Inicio */}
-          <div className="flex">
-            <NavbarItem>
-              <NavLink
-                to="/"
-                onClick={() => setIsMenuOpen(false)}
-                className={({ isActive }) =>
-                  `text-sm transition text-white hover:underline ${
-                    isActive ? "text-blue-400 " : ""
-                  }`
-                }
-              >
-                Inicio
-              </NavLink>
-            </NavbarItem>
-          </div>
+        <NavbarContent className="hidden sm:flex flex-1 items-center" justify="center">
 
           {/* Grupo 2: Capacitaciones y Responder Evaluación centrados */}
           <div className="flex gap-6 justify-center flex-1">
@@ -103,8 +100,7 @@ export default function AppNavbar() {
                   to={item.path}
                   onClick={() => setIsMenuOpen(false)}
                   className={({ isActive }) =>
-                    `text-sm transition text-white hover:underline ${
-                      isActive ? "text-blue-400 " : ""
+                    `text-sm transition text-white hover:underline ${isActive ? "text-blue-400 " : ""
                     }`
                   }
                 >
@@ -124,9 +120,8 @@ export default function AppNavbar() {
             >
               Cuenta
               <svg
-                className={`w-4 h-4 ml-1 transition-transform ${
-                  isCuentaOpen ? "rotate-180" : "rotate-0"
-                }`}
+                className={`w-4 h-4 ml-1 transition-transform ${isCuentaOpen ? "rotate-180" : "rotate-0"
+                  }`}
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
@@ -167,9 +162,8 @@ export default function AppNavbar() {
 
       {/* Mobile Sidebar */}
       <div
-        className={`fixed top-0 left-0 h-full w-64 bg-[#0f172a] text-white transform transition-transform duration-200 z-50 sm:hidden ${
-          isMenuOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed top-0 left-0 h-full w-64 bg-[#0f172a] text-white transform transition-transform duration-200 z-50 sm:hidden ${isMenuOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
       >
         <div className="flex justify-between items-center p-4 border-b border-white/20">
           <span className="font-semibold text-lg">Microlearning</span>
@@ -187,8 +181,7 @@ export default function AppNavbar() {
               to={item.path}
               onClick={() => setIsMenuOpen(false)}
               className={({ isActive }) =>
-                `text-sm px-4 py-2 rounded-md transition ${
-                  isActive ? "bg-white/10 text-blue-300" : "hover:bg-white/5"
+                `text-sm px-4 py-2 rounded-md transition ${isActive ? "bg-white/10 text-blue-300" : "hover:bg-white/5"
                 }`
               }
             >
@@ -206,9 +199,8 @@ export default function AppNavbar() {
             >
               Cuenta
               <svg
-                className={`w-4 h-4 ml-2 transition-transform ${
-                  isCuentaMobileOpen ? "rotate-180" : "rotate-0"
-                }`}
+                className={`w-4 h-4 ml-2 transition-transform ${isCuentaMobileOpen ? "rotate-180" : "rotate-0"
+                  }`}
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
