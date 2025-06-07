@@ -7,6 +7,7 @@ import Register from './pages/Register/Register';
 import Capacitaciones from './pages/Capacitaciones';
 import ResponderEvaluacion from './pages/ResponderEvaluacion';
 import AdminPage from './pages/admin/admin-page';
+import PrivateRoute from './services/PrivateRoute';
 import "./index.css"
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -18,7 +19,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <Route path="/register" element={<Register />} />
         <Route path="/capacitaciones" element={<Capacitaciones />} />
         <Route path="/responder" element={<ResponderEvaluacion />} />
-        <Route path="/admin" element={<AdminPage />} />
+        <Route path="/admin" element={
+          <PrivateRoute allowedRoles={["admin"]}>
+            <AdminPage />
+          </PrivateRoute>
+        } />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>
