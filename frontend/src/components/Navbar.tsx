@@ -7,6 +7,7 @@ import {
 } from "@nextui-org/react";
 import { Link, useNavigate, NavLink } from "react-router-dom";
 import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
+import { getCurrentUser } from "@/services/auth";
 
 export const AcmeLogo = () => (
   <svg fill="none" height="32" viewBox="0 0 32 32" width="32">
@@ -22,9 +23,12 @@ export default function AppNavbar() {
   const [isCuentaOpen, setIsCuentaOpen] = useState(false);
   const [isCuentaMobileOpen, setIsCuentaMobileOpen] = useState(false);
   const navigate = useNavigate();
-  //const token = localStorage.getItem("token");
   const cuentaRef = useRef(null);
-  const role = localStorage.getItem("role");
+  const user = getCurrentUser();
+  const role = user?.role || null;
+
+  console.log("Usuario actual:", user);
+  console.log("Rol:", role);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -51,12 +55,22 @@ export default function AppNavbar() {
   ];
 
   if (role === 'admin') {
-    menuItems.push({ name: "Admin", path: "/admin" });
-    menuItems.push({ name: "Agregar Usuario", path: "/admin/agregar-usuario" });
+    menuItems.push(
+      { name: "Admin", path: "/admin" },
+      { name: "Gestionar Usuario", path: "/admin/gestionar-usuario" }
+    );
   } else if (role === 'usuario') {
-    menuItems.push({ name: "Capacitaciones", path: "/capacitaciones" });
-    menuItems.push({ name: "Responder Evaluación", path: "/responder" })
+    menuItems.push(
+      { name: "Capacitaciones", path: "/capacitaciones" },
+      { name: "Responder Evaluación", path: "/responder" }
+    );
+  } else if (role === 'capacitador') {
+    menuItems.push(
+      { name: "Gestionar Cursos", path: "/cursos" },
+      { name: "Evaluaciones", path: "/evaluaciones" }
+    );
   }
+
   return (
     <>
       {/* NAVBAR */}

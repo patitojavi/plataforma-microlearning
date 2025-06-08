@@ -20,19 +20,24 @@ export default function Login() {
     try {
       const res = await login({ email, password });
       localStorage.setItem("token", res.token);
-      localStorage.setItem('role', res.role);
-      navigate("/capacitaciones");
-      if (res.role === "admin") {
-        navigate("/admin");
-      } else if (res.role === "capacitador") {
-        navigate("/capacitaciones");
-      } else {
-        navigate("/responder");
+      switch (res.user.role) {
+        case "admin":
+          navigate("/admin");
+          break;
+        case "capacitador":
+          navigate("/capacitaciones");
+          break;
+        case "empleado":
+          navigate("/responder");
+          break;
+        default:
+          navigate("/");
       }
     } catch {
       alert("Credenciales inválidas");
     }
   };
+
 
   return (
     <AuroraBackground>

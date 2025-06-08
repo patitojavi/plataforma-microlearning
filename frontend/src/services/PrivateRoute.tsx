@@ -1,10 +1,21 @@
-import React from "react";
 import { Navigate } from "react-router-dom";
+import { getCurrentUser } from "./auth";
 
-export default function PrivateRoute({ children, allowedRoles }: { children: React.ReactNode, allowedRoles: string[] }) {
-  const role = localStorage.getItem('role');
-  if (!role || !allowedRoles.includes(role)) {
-    return <Navigate to="/login" />;
+interface PrivateRouteProps {
+  children: React.ReactNode;
+  allowedRoles: string[];
+}
+
+export default function PrivateRoute({ children, allowedRoles }: PrivateRouteProps) {
+  const user = getCurrentUser();
+  
+  if (!user) {
+    return <Navigate to="/login" replace />;
   }
+
+  if (!allowedRoles.includes(user.role)) {
+    return <Navigate to="/" replace />; 
+  }
+
   return <>{children}</>;
 }

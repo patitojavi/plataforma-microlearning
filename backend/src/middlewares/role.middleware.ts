@@ -1,7 +1,7 @@
 import { Response, NextFunction } from 'express';
 import { AuthRequest } from './auth.middleware';
 
-export const verifyRole = (roles: ('admin' | 'capacitador')[]) => {
+export const verifyRole = (roles: ('admin' | 'capacitador' | 'usuario')[]) => {
   return (req: AuthRequest, res: Response, next: NextFunction): void => {
     const user = req.user;
 
