@@ -9,6 +9,7 @@ import ResponderEvaluacion from './pages/ResponderEvaluacion';
 import AdminPage from './pages/admin/admin-page';
 import PrivateRoute from './services/PrivateRoute';
 import ManageUsersPage from './pages/admin/gestionar-usuarios';
+import ManageCoursesPage from './pages/admin/gestionar-cursos';
 import "./index.css"
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -35,7 +36,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <ManageUsersPage />
           </PrivateRoute>
         } />
-        
+        <Route path="/admin/gestionar-cursos" element={
+          <PrivateRoute allowedRoles={["admin"]}>
+            <ManageCoursesPage />
+          </PrivateRoute>
+        } />
         {/* Ruta para responder evaluaciones */}
         <Route path="/responder" element={
           <PrivateRoute allowedRoles={["usuario"]}>
