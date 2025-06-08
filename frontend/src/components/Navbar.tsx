@@ -38,6 +38,19 @@ export default function AppNavbar() {
     navigate("/login");
   };
 
+  const getLogoRoute = () => {
+    switch(role) {
+      case 'admin':
+        return '/admin';
+      case 'capacitador':
+        return '/capacitador';
+      case 'usuario':
+        return '/usuario';
+      default:
+        return '/';
+    }
+  };
+
   useEffect(() => {
     function handleClickOutside(event) {
       if (cuentaRef.current && !cuentaRef.current.contains(event.target)) {
@@ -51,13 +64,12 @@ export default function AppNavbar() {
   }, []);
 
   const menuItems = [
-    { name: "Inicio", path: "/" }
   ];
 
   if (role === 'admin') {
     menuItems.push(
-      { name: "Admin", path: "/admin" },
-      { name: "Gestionar Usuario", path: "/admin/gestionar-usuario" }
+      { name: "Gestionar Usuario", path: "/admin/gestionar-usuario" },
+      { name: "Gestionar Cursos", path: "/admin/gestionar-cursos" }
     );
   } else if (role === 'usuario') {
     menuItems.push(
@@ -68,6 +80,10 @@ export default function AppNavbar() {
     menuItems.push(
       { name: "Gestionar Cursos", path: "/cursos" },
       { name: "Evaluaciones", path: "/evaluaciones" }
+    );
+  } else {
+    menuItems.push(
+      { name: "Inicio", path: "/" }
     );
   }
 
@@ -91,7 +107,7 @@ export default function AppNavbar() {
           <NavbarBrand className="ml-2 flex items-center">
             <AcmeLogo />
             <NavLink
-              to="/"
+              to={getLogoRoute()}
               onClick={() => setIsMenuOpen(false)}
               className={({ isActive }) =>
                 `ml-2 font-semibold text-white text-base leading-none ${isActive ? "text-blue-400 " : ""
@@ -108,7 +124,7 @@ export default function AppNavbar() {
 
           {/* Grupo 2: Capacitaciones y Responder Evaluación centrados */}
           <div className="flex gap-6 justify-center flex-1">
-            {menuItems.slice(1).map((item, index) => (
+            {menuItems.map((item, index) => (
               <NavbarItem key={index}>
                 <NavLink
                   to={item.path}

@@ -142,7 +142,7 @@ export default function ManageUsersPage() {
                     transition={{ delay: 0.2, duration: 0.5 }}
                 >
                     <h1 className="text-2xl font-bold mb-6">Gestión de Usuarios</h1>
-
+                    
                     {/* Tabla de usuarios */}
                     <div className="border rounded-lg overflow-hidden">
                         <Table>
@@ -188,11 +188,11 @@ export default function ManageUsersPage() {
                             {/* Overlay sombreado */}
                             <motion.div
                                 initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
+                                animate={{ opacity: 0.5 }}
                                 exit={{ opacity: 0 }}
-                                className="fixed inset-0 bg-gray-400 bg-opacity-50 z-40"
+                                className="fixed inset-0 bg-black z-40"
                                 onClick={handleCloseInspection}
-                                style={{ marginTop: '64px' }}
+                                style={{ marginTop: '64px' }} // Ajuste para el Navbar
                             />
 
                             {/* Panel de inspección */}
@@ -217,7 +217,7 @@ export default function ManageUsersPage() {
                                             </svg>
                                         </button>
                                     </div>
-
+                                    
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
                                         {/* Card 1: Actividad del usuario */}
                                         <Card className="border rounded-lg overflow-hidden">
