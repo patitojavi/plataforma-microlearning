@@ -46,8 +46,6 @@ export default function AppNavbar() {
         return '/capacitador';
       case 'usuario':
         return '/usuario';
-      default:
-        return '/';
     }
   };
 
@@ -78,14 +76,10 @@ export default function AppNavbar() {
     );
   } else if (role === 'capacitador') {
     menuItems.push(
-      { name: "Gestionar Cursos", path: "/cursos" },
+      { name: "Gestionar Cursos", path: "/capacitador/cursos" },
       { name: "Evaluaciones", path: "/evaluaciones" }
     );
-  } else {
-    menuItems.push(
-      { name: "Inicio", path: "/" }
-    );
-  }
+  } 
 
   return (
     <>

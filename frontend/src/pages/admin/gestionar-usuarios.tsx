@@ -192,7 +192,7 @@ export default function ManageUsersPage() {
                                 exit={{ opacity: 0 }}
                                 className="fixed inset-0 bg-black z-40"
                                 onClick={handleCloseInspection}
-                                style={{ marginTop: '64px' }} // Ajuste para el Navbar
+                                style={{ marginTop: '64px' }} 
                             />
 
                             {/* Panel de inspección */}
