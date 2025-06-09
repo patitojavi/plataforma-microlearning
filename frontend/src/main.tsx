@@ -10,6 +10,8 @@ import AdminPage from './pages/admin/admin-page';
 import PrivateRoute from './services/PrivateRoute';
 import ManageUsersPage from './pages/admin/gestionar-usuarios';
 import ManageCoursesPage from './pages/admin/gestionar-cursos';
+import CapacitadorPage from './pages/capacitador/capacitador-page';
+import CapacitadorCursos from './pages/capacitador/capacitador-cursos';
 import "./index.css"
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -39,6 +41,16 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <Route path="/admin/gestionar-cursos" element={
           <PrivateRoute allowedRoles={["admin"]}>
             <ManageCoursesPage />
+          </PrivateRoute>
+        } />
+        <Route path="/capacitador" element={
+          <PrivateRoute allowedRoles={["capacitador"]}>
+            <CapacitadorPage />
+          </PrivateRoute>
+        } />
+        <Route path="/capacitador/cursos" element={
+          <PrivateRoute allowedRoles={["capacitador"]}>
+            <CapacitadorCursos />
           </PrivateRoute>
         } />
         {/* Ruta para responder evaluaciones */}

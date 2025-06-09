@@ -49,9 +49,7 @@ export default function ManageCoursesPage() {
     instructor: "",
   });
 
-  // Datos de ejemplo - reemplazar con llamada a API real
   useEffect(() => {
-    // Simular carga de cursos
     const mockCourses: Course[] = [
       {
         id: "1",
@@ -78,7 +76,6 @@ export default function ManageCoursesPage() {
     ];
     setCourses(mockCourses);
 
-    // Simular comentarios
     const mockComments: Comment[] = [
       {
         id: "c1",
@@ -95,7 +92,6 @@ export default function ManageCoursesPage() {
     ];
     setComments(mockComments);
 
-    // Simular datos de actividad diaria
     const mockActivity = [
       { hour: "9:00", visits: 5 },
       { hour: "10:00", visits: 12 },
@@ -200,7 +196,7 @@ export default function ManageCoursesPage() {
                 exit={{ opacity: 0 }}
                 className="fixed inset-0 bg-black z-40"
                 onClick={handleCloseInspection}
-                style={{ marginTop: '64px' }} // Ajuste para el Navbar
+                style={{ marginTop: '64px' }} 
               />
 
               {/* Panel de inspección */}
