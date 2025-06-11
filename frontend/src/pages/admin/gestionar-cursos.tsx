@@ -23,6 +23,8 @@ import {
 } from "recharts";
 import { AnimatePresence, motion } from "framer-motion";
 import AppNavbar from "@/components/Navbar";
+import { obtenerCursos } from "@/services/cursos";
+import { crearCurso, eliminarCurso } from "@/services/cursos";
 
 interface Course {
   id: string;
@@ -48,33 +50,24 @@ export default function ManageCoursesPage() {
   const [editForm, setEditForm] = useState({
     instructor: "",
   });
-
+  const [createForm, setCreateForm] = useState({
+    name: "",
+    description: "",
+    instructor: "",
+  });
+  const [showCreateForm, setShowCreateForm] = useState(false);
   useEffect(() => {
-    const mockCourses: Course[] = [
-      {
-        id: "1",
-        name: "Introducción al Microlearning",
-        description: "Curso básico sobre metodologías de microaprendizaje",
-        instructor: "Juan Pérez",
-        createdAt: "2023-01-15",
-        image: "https://via.placeholder.com/150",
-      },
-      {
-        id: "2",
-        name: "Seguridad Informática",
-        description: "Fundamentos de seguridad en entornos digitales",
-        createdAt: "2023-02-10",
-      },
-      {
-        id: "3",
-        name: "Comunicación Efectiva",
-        description: "Mejora tus habilidades de comunicación en el trabajo",
-        instructor: "María Gómez",
-        createdAt: "2023-03-05",
-        image: "https://via.placeholder.com/150",
-      },
-    ];
-    setCourses(mockCourses);
+    const fetchCourses = async () => {
+      try {
+        const token = localStorage.getItem('token') || '';
+        const cursos = await obtenerCursos(token);
+        setCourses(cursos);
+      } catch (error) {
+        console.error("Error al cargar cursos:", error);
+      }
+    };
+
+    fetchCourses();
 
     const mockComments: Comment[] = [
       {
@@ -111,14 +104,53 @@ export default function ManageCoursesPage() {
     });
   };
 
+  const handleCreateCourse = async () => {
+    if (!createForm.name || !createForm.description) {
+      alert("Nombre y descripción son campos obligatorios");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert("No se encontró token de autenticación");
+        return;
+      }
+
+      const newCourse = await crearCurso({
+        name: createForm.name,
+        description: createForm.description,
+        instructor: createForm.instructor || undefined,
+      }, token);
+
+      const updatedCourses = await obtenerCursos(token);
+      setCourses(updatedCourses);
+
+      setShowCreateForm(false);
+      setCreateForm({ name: "", description: "", instructor: "" });
+      alert("Curso creado correctamente");
+    } catch (error) {
+      console.error("Error detallado:", error);
+      alert(`Error al crear curso: ${error instanceof Error ? error.message : "Error desconocido"}`);
+    }
+  };
+
   const handleUpdateCourse = () => {
     alert("Curso actualizado correctamente");
     setSelectedCourse(null);
   };
 
-  const handleDeleteCourse = (courseId: string) => {
-    alert(`Curso ${courseId} eliminado`);
-    setSelectedCourse(null);
+  const handleDeleteCourse = async (courseId: string) => {
+    try {
+      const token = localStorage.getItem('token') || '';
+      await eliminarCurso(courseId, token);
+      setCourses(courses.filter(course => course.id !== courseId));
+      setSelectedCourse(null);
+      alert("Curso eliminado correctamente");
+    } catch (error) {
+      console.error("Error al eliminar curso:", error);
+      alert("Error al eliminar curso");
+    }
   };
 
   const handleCloseInspection = () => {
@@ -140,8 +172,14 @@ export default function ManageCoursesPage() {
           transition={{ delay: 0.2, duration: 0.5 }}
         >
           <h1 className="text-2xl font-bold mb-6">Gestión de Cursos</h1>
-          
+
           {/* Tabla de cursos */}
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl font-bold"></h1>
+            <Button onClick={() => setShowCreateForm(true)}>
+              Crear Nuevo Curso
+            </Button>
+          </div>
           <div className="border rounded-lg overflow-hidden">
             <Table>
               <TableHeader>
@@ -184,6 +222,87 @@ export default function ManageCoursesPage() {
             </Table>
           </div>
         </motion.div>
+        <AnimatePresence>
+          {showCreateForm && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.5 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black z-40"
+                onClick={() => setShowCreateForm(false)}
+                style={{ marginTop: '64px' }}
+              />
+
+              <motion.div
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 50 }}
+                transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                className="fixed inset-x-0 mx-auto top-24 z-50 w-full max-w-md px-4"
+              >
+                <Card className="bg-white rounded-xl shadow-2xl overflow-hidden">
+                  <CardHeader>
+                    <CardTitle>Crear Nuevo Curso</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="name">Nombre del Curso *</Label>
+                        <Input
+                          id="name"
+                          value={createForm.name}
+                          onChange={(e) =>
+                            setCreateForm({ ...createForm, name: e.target.value })
+                          }
+                          placeholder="Nombre del curso"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="description">Descripción *</Label>
+                        <Input
+                          id="description"
+                          value={createForm.description}
+                          onChange={(e) =>
+                            setCreateForm({ ...createForm, description: e.target.value })
+                          }
+                          placeholder="Descripción del curso"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="instructor">Instructor/Capacitador</Label>
+                        <Input
+                          id="instructor"
+                          value={createForm.instructor}
+                          onChange={(e) =>
+                            setCreateForm({ ...createForm, instructor: e.target.value })
+                          }
+                          placeholder="Nombre del instructor (opcional)"
+                        />
+                      </div>
+                      <div className="flex justify-end pt-4 space-x-2">
+                        <Button
+                          variant="outline"
+                          onClick={() => setShowCreateForm(false)}
+                        >
+                          Cancelar
+                        </Button>
+                        <Button
+                          onClick={handleCreateCourse}
+                          disabled={!createForm.name || !createForm.description}
+                        >
+                          Crear Curso
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
 
         {/* Overlay y panel de inspección */}
         <AnimatePresence>
@@ -196,7 +315,7 @@ export default function ManageCoursesPage() {
                 exit={{ opacity: 0 }}
                 className="fixed inset-0 bg-black z-40"
                 onClick={handleCloseInspection}
-                style={{ marginTop: '64px' }} 
+                style={{ marginTop: '64px' }}
               />
 
               {/* Panel de inspección */}
@@ -221,7 +340,7 @@ export default function ManageCoursesPage() {
                       </svg>
                     </button>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
                     {/* Card 1: Actividad del día */}
                     <Card className="border rounded-lg overflow-hidden">
