@@ -71,7 +71,7 @@ export default function AppNavbar() {
           <NavbarBrand className="ml-2 flex items-center">
             <AcmeLogo />
             <span className="ml-2 font-semibold text-white text-base leading-none">
-              Microlearning
+              SkillBits
             </span>
           </NavbarBrand>
         </NavbarContent>
@@ -79,32 +79,15 @@ export default function AppNavbar() {
         {/* Desktop menu */}
         <NavbarContent className="hidden sm:flex flex-1 items-center" justify="between">
           {/* Grupo 1: Inicio */}
-          <div className="flex">
-            <NavbarItem>
-              <NavLink
-                to="/"
-                onClick={() => setIsMenuOpen(false)}
-                className={({ isActive }) =>
-                  `text-sm transition text-white hover:underline ${
-                    isActive ? "text-blue-400 " : ""
-                  }`
-                }
-              >
-                Inicio
-              </NavLink>
-            </NavbarItem>
-          </div>
-
-          {/* Grupo 2: Capacitaciones y Responder Evaluación centrados */}
           <div className="flex gap-6 justify-center flex-1">
-            {menuItems.slice(1).map((item, index) => (
+            {menuItems.map((item, index) => (
               <NavbarItem key={index}>
                 <NavLink
                   to={item.path}
                   onClick={() => setIsMenuOpen(false)}
                   className={({ isActive }) =>
                     `text-sm transition text-white hover:underline ${
-                      isActive ? "text-blue-400 " : ""
+                      isActive ? "text-blue-400" : ""
                     }`
                   }
                 >
@@ -140,7 +123,16 @@ export default function AppNavbar() {
                 className="absolute right-0 mt-2 w-40 bg-[#0f172a] border border-white/20 rounded shadow-lg z-50"
                 onClick={(e) => e.stopPropagation()}
               >
-                <ul>
+               <ul>
+                  <li>
+                    <Link
+                      to="/perfil"
+                      onClick={() => setIsCuentaOpen(false)}
+                      className="block px-4 py-2 text-white hover:bg-white/10"
+                    >
+                      Perfil
+                    </Link>
+                  </li>
                   <li>
                     <Link
                       to="/login"
@@ -219,32 +211,44 @@ export default function AppNavbar() {
             </button>
 
             {isCuentaMobileOpen && (
-              <ul className="mt-1 bg-[#0f172a] rounded-md border border-white/20 shadow-lg z-50">
-                <li>
-                  <Link
-                    to="/login"
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                      setIsCuentaMobileOpen(false);
-                    }}
-                    className="block px-4 py-2 text-white hover:bg-white/10"
-                  >
-                    Login
-                  </Link>
-                </li>
-                <li>
-                  <button
-                    onClick={() => {
-                      handleLogout();
-                      setIsMenuOpen(false);
-                      setIsCuentaMobileOpen(false);
-                    }}
-                    className="w-full text-left px-4 py-2 text-white hover:bg-white/10"
-                  >
-                    Cerrar sesión
-                  </button>
-                </li>
-              </ul>
+             <ul className="mt-1 bg-[#0f172a] rounded-md border border-white/20 shadow-lg z-50">
+              <li>
+                <Link
+                  to="/perfil"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    setIsCuentaMobileOpen(false);
+                  }}
+                  className="block px-4 py-2 text-white hover:bg-white/10"
+                >
+                  Perfil
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/login"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    setIsCuentaMobileOpen(false);
+                  }}
+                  className="block px-4 py-2 text-white hover:bg-white/10"
+                >
+                  Login
+                </Link>
+              </li>
+              <li>
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setIsMenuOpen(false);
+                    setIsCuentaMobileOpen(false);
+                  }}
+                  className="w-full text-left px-4 py-2 text-white hover:bg-white/10"
+                >
+                  Cerrar sesión
+                </button>
+              </li>
+            </ul>
             )}
           </div>
         </nav>
