@@ -7,6 +7,7 @@ import {
 } from "@nextui-org/react";
 import { Link, useNavigate, NavLink } from "react-router-dom";
 import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
+import { useAuth } from "../context/AuthContext";
 
 export const AcmeLogo = () => (
   <svg fill="none" height="32" viewBox="0 0 32 32" width="32">
@@ -22,11 +23,12 @@ export default function AppNavbar() {
   const [isCuentaOpen, setIsCuentaOpen] = useState(false);
   const [isCuentaMobileOpen, setIsCuentaMobileOpen] = useState(false);
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
   const cuentaRef = useRef(null);
+  const { usuario, setUsuario } = useAuth();
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    setUsuario(null);
     setIsMenuOpen(false);
     setIsCuentaOpen(false);
     setIsCuentaMobileOpen(false);
@@ -34,8 +36,8 @@ export default function AppNavbar() {
   };
 
   useEffect(() => {
-    function handleClickOutside(event) {
-      if (cuentaRef.current && !cuentaRef.current.contains(event.target)) {
+    function handleClickOutside(event: MouseEvent) {
+      if (cuentaRef.current && !(cuentaRef.current as any).contains(event.target)) {
         setIsCuentaOpen(false);
       }
     }
@@ -53,12 +55,11 @@ export default function AppNavbar() {
 
   return (
     <>
-      {/* NAVBAR */}
       <Navbar
         className="bg-[#0f172a]/90 text-white shadow-sm"
         isBordered
         onMenuOpenChange={setIsMenuOpen}
-        style={{ minHeight: "64px" }} // Más alto que el default
+        style={{ minHeight: "64px" }}
       >
         <NavbarContent className="items-center">
           <button
@@ -78,7 +79,6 @@ export default function AppNavbar() {
 
         {/* Desktop menu */}
         <NavbarContent className="hidden sm:flex flex-1 items-center" justify="between">
-          {/* Grupo 1: Inicio */}
           <div className="flex gap-6 justify-center flex-1">
             {menuItems.map((item, index) => (
               <NavbarItem key={index}>
@@ -97,7 +97,6 @@ export default function AppNavbar() {
             ))}
           </div>
 
-          {/* Grupo 3: Cuenta a la derecha */}
           <NavbarItem className="relative" ref={cuentaRef}>
             <button
               onClick={() => setIsCuentaOpen(!isCuentaOpen)}
@@ -105,7 +104,7 @@ export default function AppNavbar() {
               aria-haspopup="true"
               aria-expanded={isCuentaOpen}
             >
-              Cuenta
+              👤 {usuario?.nombre ?? "Cuenta"}
               <svg
                 className={`w-4 h-4 ml-1 transition-transform ${
                   isCuentaOpen ? "rotate-180" : "rotate-0"
@@ -118,21 +117,24 @@ export default function AppNavbar() {
                 <path d="M6 9l6 6 6-6" />
               </svg>
             </button>
+
             {isCuentaOpen && (
               <div
                 className="absolute right-0 mt-2 w-40 bg-[#0f172a] border border-white/20 rounded shadow-lg z-50"
                 onClick={(e) => e.stopPropagation()}
               >
-               <ul>
-                  <li>
-                    <Link
-                      to="/perfil"
-                      onClick={() => setIsCuentaOpen(false)}
-                      className="block px-4 py-2 text-white hover:bg-white/10"
-                    >
-                      Perfil
-                    </Link>
-                  </li>
+                <ul>
+                  {usuario && (
+                    <li>
+                      <Link
+                        to="/perfil"
+                        onClick={() => setIsCuentaOpen(false)}
+                        className="block px-4 py-2 text-white hover:bg-white/10"
+                      >
+                        Perfil
+                      </Link>
+                    </li>
+                  )}
                   <li>
                     <Link
                       to="/login"
@@ -142,14 +144,16 @@ export default function AppNavbar() {
                       Login
                     </Link>
                   </li>
-                  <li>
-                    <button
-                      onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 text-white hover:bg-white/10"
-                    >
-                      Cerrar sesión
-                    </button>
-                  </li>
+                  {usuario && (
+                    <li>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left px-4 py-2 text-white hover:bg-white/10"
+                      >
+                        Cerrar sesión
+                      </button>
+                    </li>
+                  )}
                 </ul>
               </div>
             )}
@@ -164,7 +168,7 @@ export default function AppNavbar() {
         }`}
       >
         <div className="flex justify-between items-center p-4 border-b border-white/20">
-          <span className="font-semibold text-lg">Microlearning</span>
+          <span className="font-semibold text-lg">SkillBits</span>
           <button
             onClick={() => setIsMenuOpen(false)}
             className="text-white text-xl"
@@ -188,7 +192,6 @@ export default function AppNavbar() {
             </NavLink>
           ))}
 
-          {/* Dropdown Cuenta móvil */}
           <div className="border-t border-white/20 mt-2 pt-2">
             <button
               onClick={() => setIsCuentaMobileOpen(!isCuentaMobileOpen)}
@@ -196,7 +199,7 @@ export default function AppNavbar() {
               aria-haspopup="true"
               aria-expanded={isCuentaMobileOpen}
             >
-              Cuenta
+              👤 {usuario?.nombre ?? "Cuenta"}
               <svg
                 className={`w-4 h-4 ml-2 transition-transform ${
                   isCuentaMobileOpen ? "rotate-180" : "rotate-0"
@@ -211,44 +214,48 @@ export default function AppNavbar() {
             </button>
 
             {isCuentaMobileOpen && (
-             <ul className="mt-1 bg-[#0f172a] rounded-md border border-white/20 shadow-lg z-50">
-              <li>
-                <Link
-                  to="/perfil"
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    setIsCuentaMobileOpen(false);
-                  }}
-                  className="block px-4 py-2 text-white hover:bg-white/10"
-                >
-                  Perfil
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/login"
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    setIsCuentaMobileOpen(false);
-                  }}
-                  className="block px-4 py-2 text-white hover:bg-white/10"
-                >
-                  Login
-                </Link>
-              </li>
-              <li>
-                <button
-                  onClick={() => {
-                    handleLogout();
-                    setIsMenuOpen(false);
-                    setIsCuentaMobileOpen(false);
-                  }}
-                  className="w-full text-left px-4 py-2 text-white hover:bg-white/10"
-                >
-                  Cerrar sesión
-                </button>
-              </li>
-            </ul>
+              <ul className="mt-1 bg-[#0f172a] rounded-md border border-white/20 shadow-lg z-50">
+                {usuario && (
+                  <li>
+                    <Link
+                      to="/perfil"
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        setIsCuentaMobileOpen(false);
+                      }}
+                      className="block px-4 py-2 text-white hover:bg-white/10"
+                    >
+                      Perfil
+                    </Link>
+                  </li>
+                )}
+                <li>
+                  <Link
+                    to="/login"
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      setIsCuentaMobileOpen(false);
+                    }}
+                    className="block px-4 py-2 text-white hover:bg-white/10"
+                  >
+                    Login
+                  </Link>
+                </li>
+                {usuario && (
+                  <li>
+                    <button
+                      onClick={() => {
+                        handleLogout();
+                        setIsMenuOpen(false);
+                        setIsCuentaMobileOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-white hover:bg-white/10"
+                    >
+                      Cerrar sesión
+                    </button>
+                  </li>
+                )}
+              </ul>
             )}
           </div>
         </nav>
