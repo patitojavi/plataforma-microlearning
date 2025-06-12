@@ -10,6 +10,8 @@ import {
 interface Usuario {
   nombre: string;
   email: string;
+  rut: string;
+  role: string;
 }
 
 // Tipo del contexto

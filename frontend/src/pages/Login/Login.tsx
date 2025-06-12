@@ -25,6 +25,8 @@ export default function Login() {
       setUsuario({
         nombre: res.user.username,
         email: res.user.email,
+        rut: res.user.rut,
+        role: res.user.role,
       });
       navigate("/capacitaciones");
     } catch {
