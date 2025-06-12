@@ -9,17 +9,23 @@ import { motion } from "framer-motion";
 import { Label } from "../../components/ui/label";
 import { Input } from "../../components/ui/input";
 import { cn } from "../../lib/utils";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const { setUsuario } = useAuth(); 
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const res = await login({ email, password });
       localStorage.setItem("token", res.token);
+      setUsuario({
+        nombre: res.user.username,
+        email: res.user.email,
+      });
       navigate("/capacitaciones");
     } catch {
       alert("Credenciales inválidas");
