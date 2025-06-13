@@ -23,15 +23,17 @@ import {
 } from "recharts";
 import { AnimatePresence, motion } from "framer-motion";
 import AppNavbar from "@/components/Navbar";
+import { getAllUsers, updateUserRole, deleteUser } from "@/services/auth";
 
 interface User {
     id: string;
     email: string;
     username: string;
     rut: string;
-    role: string;
+    role: 'admin' | 'capacitador' | 'usuario';
+    badges: string[];
     createdAt: string;
-    lastLogin: string;
+    updatedAt: string;
 }
 
 interface Course {
@@ -44,8 +46,7 @@ interface Course {
 export default function ManageUsersPage() {
     const [users, setUsers] = useState<User[]>([]);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
-    const [userCourses, setUserCourses] = useState<Course[]>([]);
-    const [activityData, setActivityData] = useState<any[]>([]);
+    // const [userCourses, setUserCourses] = useState<Course[]>([]);
     const [editForm, setEditForm] = useState({
         email: "",
         username: "",
@@ -54,53 +55,16 @@ export default function ManageUsersPage() {
     });
 
     useEffect(() => {
-        const mockUsers: User[] = [
-            {
-                id: "1",
-                email: "usuario1@ejemplo.com",
-                username: "Usuario Uno",
-                rut: "12345678-9",
-                role: "admin",
-                createdAt: "2023-01-15",
-                lastLogin: "2023-06-20",
-            },
-            {
-                id: "2",
-                email: "usuario2@ejemplo.com",
-                username: "Usuario Dos",
-                rut: "98765432-1",
-                role: "usuario",
-                createdAt: "2023-02-10",
-                lastLogin: "2023-06-18",
-            },
-        ];
-        setUsers(mockUsers);
+        const fetchUsers = async () => {
+            try {
+                const usersData = await getAllUsers();
+                setUsers(usersData);
+            } catch (error) {
+                console.error("Error fetching users:", error);
+            }
+        };
 
-        const mockCourses: Course[] = [
-            {
-                id: "c1",
-                name: "Introducción al Microlearning",
-                image: "https://via.placeholder.com/150",
-                progress: 75,
-            },
-            {
-                id: "c2",
-                name: "Seguridad Informática",
-                image: "https://via.placeholder.com/150",
-                progress: 30,
-            },
-        ];
-        setUserCourses(mockCourses);
-
-        const mockActivity = [
-            { name: "Ene", logins: 3 },
-            { name: "Feb", logins: 7 },
-            { name: "Mar", logins: 2 },
-            { name: "Abr", logins: 5 },
-            { name: "May", logins: 8 },
-            { name: "Jun", logins: 4 },
-        ];
-        setActivityData(mockActivity);
+        fetchUsers();
     }, []);
 
     const handleInspect = (user: User) => {
@@ -113,18 +77,37 @@ export default function ManageUsersPage() {
         });
     };
 
-    const handleUpdateUser = () => {
-        alert("Usuario actualizado correctamente");
-        setSelectedUser(null);
+     const handleUpdateUser = async () => {
+        if (!selectedUser) return;
+        
+        try {
+            await updateUserRole(selectedUser.id, editForm.role);
+            setUsers(users.map(user => 
+                user.id === selectedUser.id ? { ...user, role: editForm.role as any } : user
+            ));
+            setSelectedUser(null);
+        } catch (error) {
+            console.error("Error updating user:", error);
+        }
     };
 
-    const handleDeleteUser = (userId: string) => {
-        alert(`Usuario ${userId} eliminado`);
-        setSelectedUser(null);
+    const handleDeleteUser = async (userId: string) => {
+        try {
+            await deleteUser(userId);
+            setUsers(users.filter(user => user.id !== userId));
+            setSelectedUser(null);
+        } catch (error) {
+            console.error("Error deleting user:", error);
+        }
     };
 
     const handleCloseInspection = () => {
         setSelectedUser(null);
+    };
+
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('es-CL');
     };
 
     return (
@@ -163,13 +146,21 @@ export default function ManageUsersPage() {
                                         <TableCell>{user.username}</TableCell>
                                         <TableCell>{user.email}</TableCell>
                                         <TableCell>{user.rut}</TableCell>
-                                        <TableCell>{user.role}</TableCell>
-                                        <TableCell>{user.createdAt}</TableCell>
-                                        <TableCell>{user.lastLogin}</TableCell>
+                                        <TableCell>
+                                            <Badge variant={
+                                                user.role === 'admin' ? 'destructive' : 
+                                                user.role === 'capacitador' ? 'secondary' : 'default'
+                                            }>
+                                                {user.role}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell>{formatDate(user.createdAt)}</TableCell>
+                                        <TableCell>{formatDate(user.updatedAt)}</TableCell>
                                         <TableCell>
                                             <Button
                                                 variant="outline"
                                                 onClick={() => handleInspect(user)}
+                                                disabled={currentUserRole !== 'admin'}
                                             >
                                                 Inspeccionar
                                             </Button>
