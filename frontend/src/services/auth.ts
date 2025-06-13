@@ -54,3 +54,26 @@ export const getCurrentUser = (): UserData | null => {
     return null;
   }
 };
+
+export const getAllUsers = async (): Promise<UserData[]> => {
+  const token = localStorage.getItem('token');
+  const res = await axios.get(`${API_URL}/users`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return res.data;
+};
+
+export const updateUserRole = async (userId: string, role: string): Promise<UserData> => {
+  const token = localStorage.getItem('token');
+  const res = await axios.patch(`${API_URL}/users/${userId}/role`, { role }, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return res.data;
+};
+
+export const deleteUser = async (userId: string): Promise<void> => {
+  const token = localStorage.getItem('token');
+  await axios.delete(`${API_URL}/users/${userId}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+};

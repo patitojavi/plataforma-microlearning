@@ -23,8 +23,8 @@ import {
 } from "recharts";
 import { AnimatePresence, motion } from "framer-motion";
 import AppNavbar from "@/components/Navbar";
-import { obtenerCursos } from "@/services/cursos";
-import { crearCurso, eliminarCurso } from "@/services/cursos";
+import { crearCapacitacion, obtenerCapacitaciones, eliminarCapacitacion } from "@/services/cursos";
+import { crearCurso, eliminarCurso, obtenerCursos } from "@/services/cursos";
 
 interface Course {
   id: string;
@@ -35,6 +35,17 @@ interface Course {
   image?: string;
 }
 
+interface Capacitacion {
+  id: string;
+  titulo: string;
+  descripcion: string;
+  creador: {
+    _id: string;
+    username: string;
+  };
+  createdAt: string;
+}
+
 interface Comment {
   id: string;
   user: string;
@@ -43,6 +54,8 @@ interface Comment {
 }
 
 export default function ManageCoursesPage() {
+  const [capacitaciones, setCapacitaciones] = useState<Capacitacion[]>([]);
+  const [selectedCapacitacion, setSelectedCapacitacion] = useState<Capacitacion | null>(null);
   const [courses, setCourses] = useState<Course[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
@@ -51,23 +64,24 @@ export default function ManageCoursesPage() {
     instructor: "",
   });
   const [createForm, setCreateForm] = useState({
-    name: "",
-    description: "",
-    instructor: "",
+    titulo: "",
+    descripcion: "",
+    creador: "",
+    contenido: [""],
   });
   const [showCreateForm, setShowCreateForm] = useState(false);
   useEffect(() => {
-    const fetchCourses = async () => {
+    const fetchCapacitaciones = async () => {
       try {
         const token = localStorage.getItem('token') || '';
-        const cursos = await obtenerCursos(token);
-        setCourses(cursos);
+        const capacitaciones = await obtenerCapacitaciones(token);
+        setCapacitaciones(capacitaciones);
       } catch (error) {
-        console.error("Error al cargar cursos:", error);
+        console.error("Error al cargar capacitaciones:", error);
       }
     };
 
-    fetchCourses();
+    fetchCapacitaciones();
 
     const mockComments: Comment[] = [
       {
@@ -97,11 +111,43 @@ export default function ManageCoursesPage() {
     setDailyActivity(mockActivity);
   }, []);
 
-  const handleInspect = (course: Course) => {
-    setSelectedCourse(course);
+  const handleInspect = (capacitacion: Capacitacion) => {
+    setSelectedCapacitacion(capacitacion);
     setEditForm({
-      instructor: course.instructor || "",
+      instructor: capacitacion.creador || "",
     });
+  };
+
+  const handleCreateCapacitacion = async () => {
+    if (!createForm.titulo || !createForm.descripcion) {
+      alert("Título y descripción son campos obligatorios");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert("No se encontró token de autenticación");
+        return;
+      }
+
+      const newCapacitacion = await crearCapacitacion({
+        titulo: createForm.titulo,
+        descripcion: createForm.descripcion,
+        contenido: createForm.contenido,
+        creador: createForm.creador || undefined,
+      }, token);
+
+      const updatedCapacitaciones = await obtenerCapacitaciones(token);
+      setCapacitaciones(updatedCapacitaciones);
+
+      setShowCreateForm(false);
+      setCreateForm({ titulo: "", descripcion: "", contenido: [""], creador: "" });
+      alert("Capacitación creada correctamente");
+    } catch (error) {
+      console.error("Error detallado:", error);
+      alert(`Error al crear capacitación: ${error instanceof Error ? error.message : "Error desconocido"}`);
+    }
   };
 
   const handleCreateCourse = async () => {
@@ -138,6 +184,19 @@ export default function ManageCoursesPage() {
   const handleUpdateCourse = () => {
     alert("Curso actualizado correctamente");
     setSelectedCourse(null);
+  };
+
+  const handleDeleteCapacitacion = async (capacitacionId: string) => {
+    try {
+      const token = localStorage.getItem('token') || '';
+      await eliminarCapacitacion(capacitacionId, token);
+      setCapacitaciones(capacitaciones.filter(cap => cap.id !== capacitacionId));
+      setSelectedCapacitacion(null);
+      alert("Capacitación eliminada correctamente");
+    } catch (error) {
+      console.error("Error al eliminar capacitación:", error);
+      alert("Error al eliminar capacitación");
+    }
   };
 
   const handleDeleteCourse = async (courseId: string) => {
@@ -188,23 +247,24 @@ export default function ManageCoursesPage() {
                   <TableHead>Nombre</TableHead>
                   <TableHead>Descripción</TableHead>
                   <TableHead>Capacitador</TableHead>
-                  <TableHead>Acciones</TableHead>
+                  <TableHead>Fecha de Creación</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {courses.length > 0 ? (
-                  courses.map((course) => (
-                    <TableRow key={course.id}>
-                      <TableCell className="font-medium">{course.id}</TableCell>
-                      <TableCell>{course.name}</TableCell>
+                {capacitaciones.length > 0 ? (
+                  capacitaciones.map((capacitacion) => (
+                    <TableRow key={capacitacion.id}>
+                      <TableCell className="font-medium">{capacitacion.id}</TableCell>
+                      <TableCell>{capacitacion.titulo}</TableCell>
                       <TableCell className="max-w-xs truncate">
-                        {course.description}
+                        {capacitacion.descripcion}
                       </TableCell>
-                      <TableCell>{course.instructor || "-"}</TableCell>
+                      <TableCell>{capacitacion.creador?.username || "-"}</TableCell>
+                      <TableCell>{capacitacion.createdAt || "-"}</TableCell>
                       <TableCell>
                         <Button
                           variant="outline"
-                          onClick={() => handleInspect(course)}
+                          onClick={() => handleInspect(capacitacion)}
                         >
                           Inspeccionar
                         </Button>
@@ -214,7 +274,7 @@ export default function ManageCoursesPage() {
                 ) : (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center py-8">
-                      No hay cursos disponibles
+                      No hay capacitaciones disponibles
                     </TableCell>
                   </TableRow>
                 )}
@@ -248,14 +308,14 @@ export default function ManageCoursesPage() {
                   <CardContent>
                     <div className="space-y-4">
                       <div>
-                        <Label htmlFor="name">Nombre del Curso *</Label>
+                        <Label htmlFor="name">Nombre de la capacitación *</Label>
                         <Input
                           id="name"
                           value={createForm.name}
                           onChange={(e) =>
                             setCreateForm({ ...createForm, name: e.target.value })
                           }
-                          placeholder="Nombre del curso"
+                          placeholder="Nombre de la capacitación"
                           required
                         />
                       </div>
