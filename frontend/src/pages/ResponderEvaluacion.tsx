@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { responderEvaluacion } from '../services/evaluacion';
-import Navbar from '../components/Navbar';
+import { responderEvaluacion } from '@/services/evaluacion';
+import Navbar from '@/components/Navbar';
 
 export default function ResponderEvaluacion() {
   const [evaluacionId, setEvaluacionId] = useState('');
