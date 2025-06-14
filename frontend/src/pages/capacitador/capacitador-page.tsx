@@ -1,4 +1,4 @@
-import AppNavbar from "@/components/Navbar";
+import AppNavbar from "@/components/NavbarAdmin";
 
 export default function CapacitadorPage() {
     return (
