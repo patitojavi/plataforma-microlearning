@@ -62,3 +62,20 @@ export const verProgreso = async (req: AuthRequest, res: Response) => {
   const progreso = cap.progreso.get(userId);
   res.json({ progreso });
 };
+
+
+
+export const eliminarCapacitacion = async (req: AuthRequest, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    const deleted = await Capacitacion.findByIdAndDelete(id);
+    if (!deleted) {
+      return res.status(404).json({ message: 'Capacitación no encontrada' });
+    }
+    res.json({ message: 'Capacitación eliminada correctamente' });
+  } catch (error) {
+    console.error("Error al eliminar capacitación:", error);
+    res.status(500).json({ message: 'Error al eliminar capacitación' });
+  }
+};

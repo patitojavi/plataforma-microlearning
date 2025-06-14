@@ -9,21 +9,6 @@ interface Course {
   image?: string;
 }
 
-interface Capacitacion {
-  _id: string;
-  titulo: string;
-  descripcion: string;
-  creador: {
-    _id: string;
-    username: string;
-  };
-  contenido?: string[];
-  miembros?: string[];
-  progreso?: Record<string, number>;
-  createdAt: string;
-  image?: string;
-}
-
 const API_URL = "http://localhost:5000/api/capacitaciones";
 
 export const crearCurso = async (data: {

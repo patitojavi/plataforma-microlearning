@@ -11,7 +11,7 @@ import { Input } from "../../components/ui/input";
 import { cn } from "../../lib/utils";
 
 export default function Register() {
-  const [form, setForm] = useState({ email: "", username: "", rut: "", password: "" });
+  const [form, setForm] = useState({ email: "", username: "", rut: "", password: "", role:"usuario" });
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -25,7 +25,6 @@ export default function Register() {
       localStorage.setItem("token", res.token);
       navigate("/capacitaciones");
     } catch (err) {
-      console.log(err)
       alert("Error al registrar");
     }
   };
