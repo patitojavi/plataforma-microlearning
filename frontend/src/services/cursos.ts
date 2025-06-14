@@ -9,7 +9,7 @@ interface Course {
   image?: string;
 }
 
-const API_URL = "http://localhost:5000/api/cursos";
+const API_URL = "http://localhost:5000/api/capacitaciones";
 
 export const crearCurso = async (data: {
   name: string; 
