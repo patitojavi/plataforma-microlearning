@@ -8,6 +8,7 @@ import {
 import { Link, useNavigate, NavLink } from "react-router-dom";
 import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
 import { getCurrentUser } from "@/services/auth";
+import { useAuth } from "../context/AuthContext";
 
 export const AcmeLogo = () => (
   <svg fill="none" height="32" viewBox="0 0 32 32" width="32">
@@ -25,11 +26,13 @@ export default function AppNavbar() {
   const navigate = useNavigate();
   const cuentaRef = useRef(null);
   const user = getCurrentUser();
+  const { usuario, setUsuario } = useAuth();
   const role = user?.role || null;
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     setIsMenuOpen(false);
+    setUsuario(null);
     setIsCuentaOpen(false);
     setIsCuentaMobileOpen(false);
     navigate("/login");
@@ -136,7 +139,7 @@ export default function AppNavbar() {
               aria-expanded={isCuentaOpen}
             >
               <span className="truncate max-w-[120px]">
-                👤 {user?.nombre ?? "Cuenta"}
+                👤 {usuario?.nombre ?? "Cuenta"}
               </span>
               <svg
                 className={`w-4 h-4 ml-1 transition-transform ${
@@ -159,7 +162,7 @@ export default function AppNavbar() {
                   {user && (
                     <>
                       <li className="px-4 py-2 text-sm text-blue-300 border-b border-white/10">
-                        {user.nombre}
+                        {usuario.nombre}
                       </li>
                       <li>
                         <Link
@@ -239,7 +242,7 @@ export default function AppNavbar() {
           <div className="border-t border-white/20 mt-2 pt-2">
             {user && (
               <div className="px-4 py-2 text-sm text-blue-300 font-medium border-b border-white/10">
-                👤 {user.nombre}
+                👤 {usuario.nombre}
               </div>
             )}
             <button
