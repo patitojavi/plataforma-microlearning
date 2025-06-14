@@ -22,8 +22,7 @@ import {
     ResponsiveContainer,
 } from "recharts";
 import { AnimatePresence, motion } from "framer-motion";
-import AppNavbar from "@/components/Navbar";
-import { getAllUsers, updateUserRole, deleteUser } from "@/services/auth";
+import AppNavbar from "@/components/NavbarAdmin";
 
 interface User {
     id: string;

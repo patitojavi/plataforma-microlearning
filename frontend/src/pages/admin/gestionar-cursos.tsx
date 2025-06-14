@@ -23,16 +23,15 @@ import {
 } from "recharts";
 import { AnimatePresence, motion } from "framer-motion";
 import AppNavbar from "@/components/Navbar";
-import { crearCapacitacion, obtenerCapacitaciones, eliminarCapacitacion } from "@/services/cursos";
-import { crearCurso, eliminarCurso, obtenerCursos } from "@/services/cursos";
+import { obtenerCursos } from "@/services/cursos";
+import { crearCurso, eliminarCurso } from "@/services/cursos";
 
 interface Course {
-  id: string;
-  name: string;
-  description: string;
-  instructor?: string;
+  _id: string;
+  titulo: string;
+  descripcion: string;
+  creador?: { username: string };
   createdAt: string;
-  image?: string;
 }
 
 interface Capacitacion {
@@ -64,42 +63,31 @@ export default function ManageCoursesPage() {
     instructor: "",
   });
   const [createForm, setCreateForm] = useState({
-    titulo: "",
-    descripcion: "",
-    creador: "",
-    contenido: [""],
+    name: "",
+    description: "",
+    instructor: "",
   });
   const [showCreateForm, setShowCreateForm] = useState(false);
+
   useEffect(() => {
-    const fetchCapacitaciones = async () => {
+    const fetchCourses = async () => {
       try {
         const token = localStorage.getItem('token') || '';
-        const capacitaciones = await obtenerCapacitaciones(token);
-        setCapacitaciones(capacitaciones);
+        const cursos = await obtenerCursos(token);
+        setCourses(cursos);
       } catch (error) {
-        console.error("Error al cargar capacitaciones:", error);
+        console.error("Error al cargar cursos:", error);
       }
     };
 
-    fetchCapacitaciones();
+    fetchCourses();
 
-    const mockComments: Comment[] = [
-      {
-        id: "c1",
-        user: "Usuario1",
-        text: "Excelente curso, muy útil para mi trabajo diario",
-        date: "2023-06-15",
-      },
-      {
-        id: "c2",
-        user: "Usuario2",
-        text: "El contenido es bueno pero faltan ejemplos prácticos",
-        date: "2023-06-18",
-      },
-    ];
-    setComments(mockComments);
+    setComments([
+      { id: "c1", user: "Usuario1", text: "Excelente curso", date: "2023-06-15" },
+      { id: "c2", user: "Usuario2", text: "Faltan ejemplos prácticos", date: "2023-06-18" }
+    ]);
 
-    const mockActivity = [
+    setDailyActivity([
       { hour: "9:00", visits: 5 },
       { hour: "10:00", visits: 12 },
       { hour: "11:00", visits: 8 },
@@ -107,14 +95,23 @@ export default function ManageCoursesPage() {
       { hour: "13:00", visits: 3 },
       { hour: "14:00", visits: 7 },
       { hour: "15:00", visits: 10 },
-    ];
-    setDailyActivity(mockActivity);
+    ]);
   }, []);
 
-  const handleInspect = (capacitacion: Capacitacion) => {
-    setSelectedCapacitacion(capacitacion);
+  const fetchCourses = async () => {
+    try {
+      const token = localStorage.getItem("token") || "";
+      const cursos = await obtenerCursos(token);
+      setCourses(cursos);
+    } catch (error) {
+      console.error("Error al cargar capacitaciones:", error);
+    }
+  };
+
+  const handleInspect = (course: Course) => {
+    setSelectedCourse(course);
     setEditForm({
-      instructor: capacitacion.creador || "",
+      instructor: course.instructor || "",
     });
   };
 
@@ -151,39 +148,25 @@ export default function ManageCoursesPage() {
   };
 
   const handleCreateCourse = async () => {
-    if (!createForm.name || !createForm.description) {
-      alert("Nombre y descripción son campos obligatorios");
+    if (!createForm.titulo || !createForm.descripcion) {
+      alert("Título y descripción son obligatorios");
       return;
     }
-
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        alert("No se encontró token de autenticación");
-        return;
-      }
-
-      const newCourse = await crearCurso({
-        name: createForm.name,
-        description: createForm.description,
-        instructor: createForm.instructor || undefined,
+      const token = localStorage.getItem("token") || "";
+      await crearCurso({
+        titulo: createForm.titulo,
+        descripcion: createForm.descripcion,
+        contenido: [],
       }, token);
-
-      const updatedCourses = await obtenerCursos(token);
-      setCourses(updatedCourses);
-
+      await fetchCourses();
       setShowCreateForm(false);
-      setCreateForm({ name: "", description: "", instructor: "" });
-      alert("Curso creado correctamente");
+      setCreateForm({ titulo: "", descripcion: "", instructor: "" });
+      alert("Capacitación creada exitosamente");
     } catch (error) {
-      console.error("Error detallado:", error);
-      alert(`Error al crear curso: ${error instanceof Error ? error.message : "Error desconocido"}`);
+      console.error("Error al crear capacitación:", error);
+      alert("Error al crear capacitación");
     }
-  };
-
-  const handleUpdateCourse = () => {
-    alert("Curso actualizado correctamente");
-    setSelectedCourse(null);
   };
 
   const handleDeleteCapacitacion = async (capacitacionId: string) => {
@@ -199,45 +182,47 @@ export default function ManageCoursesPage() {
     }
   };
 
-  const handleDeleteCourse = async (courseId: string) => {
+  const handleDeleteCourse = async (id: string) => {
     try {
-      const token = localStorage.getItem('token') || '';
-      await eliminarCurso(courseId, token);
-      setCourses(courses.filter(course => course.id !== courseId));
+      const token = localStorage.getItem("token") || "";
+      await eliminarCurso(id, token);
+      await fetchCourses();
       setSelectedCourse(null);
-      alert("Curso eliminado correctamente");
+      alert("Capacitación eliminada correctamente");
     } catch (error) {
-      console.error("Error al eliminar curso:", error);
-      alert("Error al eliminar curso");
+      console.error("Error al eliminar capacitación:", error);
+      alert("Error al eliminar capacitación");
     }
   };
 
-  const handleCloseInspection = () => {
-    setSelectedCourse(null);
-  };
-
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="bg-gray-100 min-h-screen"
-    >
+    <div>
       <AppNavbar />
-      <div className="container mx-auto p-4 relative">
-        <motion.div
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-        >
-          <h1 className="text-2xl font-bold mb-6">Gestión de Cursos</h1>
+      <div className="p-4">
+        <h1 className="text-2xl font-bold mb-4">Gestión de Capacitaciones</h1>
+        <Button onClick={() => setShowCreateForm(true)}>Crear Capacitación</Button>
 
-          {/* Tabla de cursos */}
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold"></h1>
-            <Button onClick={() => setShowCreateForm(true)}>
-              Crear Nuevo Curso
-            </Button>
+        {showCreateForm && (
+          <div className="mt-4 border p-4 rounded-lg bg-white shadow">
+            <h2 className="text-lg font-semibold mb-2">Nueva Capacitación</h2>
+            <div className="space-y-2">
+              <Label htmlFor="titulo">Título</Label>
+              <Input
+                id="titulo"
+                value={createForm.titulo}
+                onChange={e => setCreateForm({ ...createForm, titulo: e.target.value })}
+              />
+              <Label htmlFor="descripcion">Descripción</Label>
+              <Input
+                id="descripcion"
+                value={createForm.descripcion}
+                onChange={e => setCreateForm({ ...createForm, descripcion: e.target.value })}
+              />
+              <div className="flex gap-2 mt-4">
+                <Button onClick={handleCreateCourse}>Guardar</Button>
+                <Button variant="outline" onClick={() => setShowCreateForm(false)}>Cancelar</Button>
+              </div>
+            </div>
           </div>
           <div className="border rounded-lg overflow-hidden">
             <Table>
@@ -247,24 +232,23 @@ export default function ManageCoursesPage() {
                   <TableHead>Nombre</TableHead>
                   <TableHead>Descripción</TableHead>
                   <TableHead>Capacitador</TableHead>
-                  <TableHead>Fecha de Creación</TableHead>
+                  <TableHead>Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {capacitaciones.length > 0 ? (
-                  capacitaciones.map((capacitacion) => (
-                    <TableRow key={capacitacion.id}>
-                      <TableCell className="font-medium">{capacitacion.id}</TableCell>
-                      <TableCell>{capacitacion.titulo}</TableCell>
+                {courses.length > 0 ? (
+                  courses.map((course) => (
+                    <TableRow key={course.id}>
+                      <TableCell className="font-medium">{course.id}</TableCell>
+                      <TableCell>{course.name}</TableCell>
                       <TableCell className="max-w-xs truncate">
-                        {capacitacion.descripcion}
+                        {course.description}
                       </TableCell>
-                      <TableCell>{capacitacion.creador?.username || "-"}</TableCell>
-                      <TableCell>{capacitacion.createdAt || "-"}</TableCell>
+                      <TableCell>{course.instructor || "-"}</TableCell>
                       <TableCell>
                         <Button
                           variant="outline"
-                          onClick={() => handleInspect(capacitacion)}
+                          onClick={() => handleInspect(course)}
                         >
                           Inspeccionar
                         </Button>
@@ -274,7 +258,7 @@ export default function ManageCoursesPage() {
                 ) : (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center py-8">
-                      No hay capacitaciones disponibles
+                      No hay cursos disponibles
                     </TableCell>
                   </TableRow>
                 )}
@@ -308,14 +292,14 @@ export default function ManageCoursesPage() {
                   <CardContent>
                     <div className="space-y-4">
                       <div>
-                        <Label htmlFor="name">Nombre de la capacitación *</Label>
+                        <Label htmlFor="name">Nombre del Curso *</Label>
                         <Input
                           id="name"
                           value={createForm.name}
                           onChange={(e) =>
                             setCreateForm({ ...createForm, name: e.target.value })
                           }
-                          placeholder="Nombre de la capacitación"
+                          placeholder="Nombre del curso"
                           required
                         />
                       </div>
@@ -494,3 +478,4 @@ export default function ManageCoursesPage() {
     </motion.div>
   );
 }
+  
