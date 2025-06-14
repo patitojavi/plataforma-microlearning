@@ -25,6 +25,7 @@ export default function AppNavbar() {
   const navigate = useNavigate();
   const cuentaRef = useRef(null);
   const { usuario, setUsuario } = useAuth();
+  const role = usuario?.role || null;
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -34,6 +35,21 @@ export default function AppNavbar() {
     setIsCuentaMobileOpen(false);
     navigate("/login");
   };
+
+  const getLogoRoute = () => {
+    switch (role) {
+      case "usuario":
+        return "/usuario";
+      default:
+        return "/";
+    }
+  };
+
+  useEffect(() => {
+    if (role === "usuario" && window.location.pathname === "/") {
+      navigate("/usuario");
+    }
+  }, [role, navigate]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -48,7 +64,6 @@ export default function AppNavbar() {
   }, []);
 
   const menuItems = [
-    { name: "Inicio", path: "/" },
     { name: "Capacitaciones", path: "/capacitaciones" },
     { name: "Responder Evaluación", path: "/responder" },
   ];
@@ -56,7 +71,7 @@ export default function AppNavbar() {
   return (
     <>
       <Navbar
-        className="bg-[#0f172a]/90 text-white shadow-sm"
+        className="bg-indigo-950 text-white shadow-sm"
         isBordered
         onMenuOpenChange={setIsMenuOpen}
         style={{ minHeight: "64px" }}
@@ -69,15 +84,22 @@ export default function AppNavbar() {
           >
             {isMenuOpen ? <AiOutlineClose /> : <AiOutlineMenu />}
           </button>
-          <NavbarBrand className="ml-2 flex items-center">
+          <NavbarBrand className="ml-1 flex items-center">
             <AcmeLogo />
-            <span className="ml-2 font-semibold text-white text-base leading-none">
+            <NavLink
+              to={getLogoRoute()}
+              onClick={() => setIsMenuOpen(false)}
+              className={({ isActive }) =>
+                `ml-2 font-semibold text-white text-base leading-none ${
+                  isActive ? "text-blue-400" : ""
+                }`
+              }
+            >
               SkillBits
-            </span>
+            </NavLink>
           </NavbarBrand>
         </NavbarContent>
 
-        {/* Desktop menu */}
         <NavbarContent className="hidden sm:flex flex-1 items-center" justify="between">
           <div className="flex gap-6 justify-center flex-1">
             {menuItems.map((item, index) => (
@@ -86,9 +108,7 @@ export default function AppNavbar() {
                   to={item.path}
                   onClick={() => setIsMenuOpen(false)}
                   className={({ isActive }) =>
-                    `text-sm transition text-white hover:underline ${
-                      isActive ? "text-blue-400" : ""
-                    }`
+                    `text-sm transition text-white hover:underline ${isActive ? "text-blue-400" : ""}`
                   }
                 >
                   {item.name}
@@ -106,9 +126,7 @@ export default function AppNavbar() {
             >
               👤 {usuario?.nombre ?? "Cuenta"}
               <svg
-                className={`w-4 h-4 ml-1 transition-transform ${
-                  isCuentaOpen ? "rotate-180" : "rotate-0"
-                }`}
+                className={`w-4 h-4 ml-1 transition-transform ${isCuentaOpen ? "rotate-180" : "rotate-0"}`}
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
@@ -125,15 +143,20 @@ export default function AppNavbar() {
               >
                 <ul>
                   {usuario && (
-                    <li>
-                      <Link
-                        to="/perfil"
-                        onClick={() => setIsCuentaOpen(false)}
-                        className="block px-4 py-2 text-white hover:bg-white/10"
-                      >
-                        Perfil
-                      </Link>
-                    </li>
+                    <>
+                      <li className="px-4 py-2 text-sm text-blue-300 border-b border-white/10">
+                        {usuario.nombre}
+                      </li>
+                      <li>
+                        <Link
+                          to="/perfil"
+                          onClick={() => setIsCuentaOpen(false)}
+                          className="block px-4 py-2 text-white hover:bg-white/10"
+                        >
+                          Perfil
+                        </Link>
+                      </li>
+                    </>
                   )}
                   <li>
                     <Link
@@ -163,12 +186,12 @@ export default function AppNavbar() {
 
       {/* Mobile Sidebar */}
       <div
-        className={`fixed top-0 left-0 h-full w-64 bg-[#0f172a] text-white transform transition-transform duration-200 z-50 sm:hidden ${
-          isMenuOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed top-0 left-0 h-full w-64 bg-indigo-950 text-white transform transition-transform duration-200 z-50 sm:hidden ${isMenuOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
         <div className="flex justify-between items-center p-4 border-b border-white/20">
-          <span className="font-semibold text-lg">SkillBits</span>
+          <NavLink to={getLogoRoute()} onClick={() => setIsMenuOpen(false)} className="font-semibold text-lg hover:text-blue-400">
+            SkillBits
+          </NavLink>
           <button
             onClick={() => setIsMenuOpen(false)}
             className="text-white text-xl"
@@ -183,9 +206,7 @@ export default function AppNavbar() {
               to={item.path}
               onClick={() => setIsMenuOpen(false)}
               className={({ isActive }) =>
-                `text-sm px-4 py-2 rounded-md transition ${
-                  isActive ? "bg-white/10 text-blue-300" : "hover:bg-white/5"
-                }`
+                `text-sm px-4 py-2 rounded-md transition ${isActive ? "bg-white/10 text-blue-300" : "hover:bg-white/5"}`
               }
             >
               {item.name}
@@ -201,9 +222,7 @@ export default function AppNavbar() {
             >
               👤 {usuario?.nombre ?? "Cuenta"}
               <svg
-                className={`w-4 h-4 ml-2 transition-transform ${
-                  isCuentaMobileOpen ? "rotate-180" : "rotate-0"
-                }`}
+                className={`w-4 h-4 ml-2 transition-transform ${isCuentaMobileOpen ? "rotate-180" : "rotate-0"}`}
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
@@ -216,18 +235,23 @@ export default function AppNavbar() {
             {isCuentaMobileOpen && (
               <ul className="mt-1 bg-[#0f172a] rounded-md border border-white/20 shadow-lg z-50">
                 {usuario && (
-                  <li>
-                    <Link
-                      to="/perfil"
-                      onClick={() => {
-                        setIsMenuOpen(false);
-                        setIsCuentaMobileOpen(false);
-                      }}
-                      className="block px-4 py-2 text-white hover:bg-white/10"
-                    >
-                      Perfil
-                    </Link>
-                  </li>
+                  <>
+                    <li className="px-4 py-2 text-sm text-blue-300 border-b border-white/10">
+                      {usuario.nombre}
+                    </li>
+                    <li>
+                      <Link
+                        to="/perfil"
+                        onClick={() => {
+                          setIsMenuOpen(false);
+                          setIsCuentaMobileOpen(false);
+                        }}
+                        className="block px-4 py-2 text-white hover:bg-white/10"
+                      >
+                        Perfil
+                      </Link>
+                    </li>
+                  </>
                 )}
                 <li>
                   <Link
