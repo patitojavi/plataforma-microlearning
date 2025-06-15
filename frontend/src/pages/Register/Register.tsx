@@ -25,6 +25,7 @@ export default function Register() {
       localStorage.setItem("token", res.token);
       navigate("/capacitaciones");
     } catch (err) {
+      console.error("Error al registrar:", err);
       alert("Error al registrar");
     }
   };

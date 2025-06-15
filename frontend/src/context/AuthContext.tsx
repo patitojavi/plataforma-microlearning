@@ -3,7 +3,7 @@ import {
   useContext,
   useState,
   useEffect,
-  ReactNode,
+  type ReactNode,
 } from "react";
 
 // Tipo de usuario

@@ -28,7 +28,19 @@ export default function Login() {
         rut: res.user.rut,
         role: res.user.role,
       });
-      navigate("/capacitaciones");
+      switch (res.user.role) {
+        case "admin":
+          navigate("/admin");
+          break;
+        case "capacitador":
+          navigate("/capacitaciones");
+          break;
+        case "usuario":
+          navigate("/usuario");
+          break;
+        default:
+          navigate("/");
+      }
     } catch {
       alert("Credenciales inválidas");
     }
