@@ -1,20 +1,21 @@
 import axios from "axios";
 
-interface Course {
-  id: string;
-  name: string;
-  description: string;
-  instructor?: string;
+export interface Course {
+  _id: string;
+  titulo: string;
+  descripcion: string;
+  creador?: {username: string;};
+  contenido: [];
   createdAt: string;
-  image?: string;
 }
 
 const API_URL = "http://localhost:5000/api/capacitaciones";
 
 export const crearCurso = async (data: {
-  name: string; 
-  description: string;
-  instructor?: string; 
+  titulo: string; 
+  descripcion: string;
+  creador?: {username: string; };
+  contenido: []; 
 }, token: string) => {
   try {
     console.log("Enviando datos a:", API_URL);

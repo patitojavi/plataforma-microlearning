@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+//import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
     BarChart,
@@ -41,11 +41,15 @@ interface Course {
     progress: number;
 }
 
+interface DailyActivity {
+  name: string;
+  logins: number;
+}
 export default function ManageUsersPage() {
     const [users, setUsers] = useState<User[]>([]);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [userCourses, setUserCourses] = useState<Course[]>([]);
-    const [activityData, setActivityData] = useState<any[]>([]);
+    const [activityData, setActivityData] = useState<DailyActivity[]>([]);
     const [editForm, setEditForm] = useState({
         email: "",
         username: "",
@@ -142,7 +146,7 @@ export default function ManageUsersPage() {
                     transition={{ delay: 0.2, duration: 0.5 }}
                 >
                     <h1 className="text-2xl font-bold mb-6">Gestión de Usuarios</h1>
-                    
+
                     {/* Tabla de usuarios */}
                     <div className="border rounded-lg overflow-hidden">
                         <Table>
@@ -192,7 +196,7 @@ export default function ManageUsersPage() {
                                 exit={{ opacity: 0 }}
                                 className="fixed inset-0 bg-black z-40"
                                 onClick={handleCloseInspection}
-                                style={{ marginTop: '64px' }} 
+                                style={{ marginTop: '64px' }}
                             />
 
                             {/* Panel de inspección */}
@@ -217,7 +221,7 @@ export default function ManageUsersPage() {
                                             </svg>
                                         </button>
                                     </div>
-                                    
+
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
                                         {/* Card 1: Actividad del usuario */}
                                         <Card className="border rounded-lg overflow-hidden">
@@ -247,36 +251,6 @@ export default function ManageUsersPage() {
                                             </CardHeader>
                                             <CardContent>
                                                 <div className="space-y-4">
-                                                    <div>
-                                                        <Label htmlFor="email">Email</Label>
-                                                        <Input
-                                                            id="email"
-                                                            value={editForm.email}
-                                                            onChange={(e) =>
-                                                                setEditForm({ ...editForm, email: e.target.value })
-                                                            }
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <Label htmlFor="username">Nombre de usuario</Label>
-                                                        <Input
-                                                            id="username"
-                                                            value={editForm.username}
-                                                            onChange={(e) =>
-                                                                setEditForm({ ...editForm, username: e.target.value })
-                                                            }
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <Label htmlFor="rut">RUT</Label>
-                                                        <Input
-                                                            id="rut"
-                                                            value={editForm.rut}
-                                                            onChange={(e) =>
-                                                                setEditForm({ ...editForm, rut: e.target.value })
-                                                            }
-                                                        />
-                                                    </div>
                                                     <div>
                                                         <Label htmlFor="role">Rol</Label>
                                                         <select
