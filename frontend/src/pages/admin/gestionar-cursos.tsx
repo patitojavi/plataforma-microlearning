@@ -24,6 +24,7 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import AppNavbar from "@/components/NavbarAdmin";
 import { obtenerCursos, crearCurso, eliminarCurso, type Course } from "@/services/cursos";
+import { toast } from "sonner";
 
 interface Comment {
   id: string;
@@ -114,7 +115,7 @@ export default function ManageCoursesPage() {
 
   const handleCreateCourse = async () => {
     if (!createForm.titulo || !createForm.descripcion) {
-      alert("Título y descripción son obligatorios");
+      toast.error("Por favor, completa todos los campos requeridos.");
       return;
     }
     try {
@@ -128,10 +129,16 @@ export default function ManageCoursesPage() {
       await fetchCourses();
       setShowCreateForm(false);
       setCreateForm({ titulo: "", descripcion: "", creador: "" });
-      alert("Capacitación creada exitosamente");
+      toast.success("Capacitación creada correctamente", {
+          position: "top-center",
+          duration: 3000,
+      });
     } catch (error) {
       console.error("Error al crear capacitación:", error);
-      alert("Error al crear capacitación");
+      toast.error("Error al crear capacitación", {
+          position: "top-center",
+          duration: 3000,
+      });
     }
   };
 
@@ -141,10 +148,16 @@ export default function ManageCoursesPage() {
       await eliminarCurso(id, token);
       await fetchCourses();
       setSelectedCourse(null);
-      alert("Capacitación eliminada correctamente");
+      toast.success("Capacitación eliminada correctamente", {
+          position: "top-center",
+          duration: 3000,
+      });
     } catch (error) {
       console.error("Error al eliminar capacitación:", error);
-      alert("Error al eliminar capacitación");
+      toast.error("Error al eliminar capacitación", {
+          position: "top-center",
+          duration: 3000,
+      });
     }
   };
 
