@@ -43,8 +43,9 @@ export default function Login() {
         className="relative flex flex-col items-center justify-center px-6 gap-8 max-w-xl mx-auto"
       >
         <h1 className="text-4xl md:text-5xl font-extrabold text-center max-w-md bg-gradient-to-r text-white bg-clip-text drop-shadow-lg leading-tight">
-          Bienvenido
+          Bienvenido 
         </h1>
+        
         <CardContainer className="inter-var w-full z-10">
           <CardBody className="bg-[#0f172a]/85 backdrop-blur-md border border-gray-400/30 rounded-xl px-8 py-14 shadow-md w-full max-w-2xl mx-auto overflow-visible min-h-[450px]">
             <CardItem translateZ={50} className="text-3xl font-bold text-white select-none mb-8">
