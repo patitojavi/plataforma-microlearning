@@ -47,6 +47,9 @@ plataforma-microlearning/
 ├── backend/   # API Express y modelos de MongoDB
 └── frontend/  # Aplicación React + Vite
 ```
+---
+
+
 ## ⚙️ Configuración de Entorno
 ### Backend
 Crear un archivo `.env` en la carpeta `backend` con el siguiente contenido:
