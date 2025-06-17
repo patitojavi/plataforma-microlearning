@@ -56,11 +56,10 @@ MONGO_URI=<cadena de conexión a MongoDB>
 JWT_SECRET=<secreto para firmar los JWT>
 PORT=5000  # (opcional)
 ```
-
-
 ### Frontend
 No requiere variables de entorno por defecto. La URL base de la API es http://localhost:5000. Puedes modificarla en los archivos frontend/src/services/*.ts si alojas el backend en otro lugar.
 
+---
 ## 🛠️ Instalación y Ejecución
 En ambas carpetas (frontend y backend), ejecutar:
 ```
@@ -79,19 +78,23 @@ Construcción para Producción
 ```
 npm run build
 ```
+---
 
 ## ☁️ Despliegue
 
 - **Vercel** para el frontend.
 - **Render** para el backend y la base de datos.
 
-
+---
 
 ## Roles y navegación
 
 - **Admin**: acceso a `/admin` y páginas para gestionar usuarios y cursos.
 - **Capacitador**: acceso a `/capacitador` y vistas de cursos propios.
 - **Usuario**: acceso a `/usuario`, lista de capacitaciones y evaluaciones.
+
+
+---
 
 ## Principales rutas de la API
 
@@ -109,6 +112,10 @@ npm run build
 - **Evaluaciones**
   - `POST /api/evaluaciones` (admin/capacitador)
   - `POST /api/evaluaciones/responder`
+
+---
+## 👨‍💻 Autores
+
 
 - **Patricio Benavides** - **Backend/API**
 - **Nelson Neculhueque** - **Frontend Cliente**
