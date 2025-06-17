@@ -1,99 +1,91 @@
-# Plataforma de Microlearning Empresarial
+# Plataforma de Microlearning Empresarial - **SKILL BITS**
 
-## Descripción del Proyecto
-## Descripción general
+## 🧠 Descripción General
 
-**Plataforma de Microlearning Empresarial** es una solución innovadora diseñada para capacitar empleados mediante sesiones breves y dinámicas. La plataforma incluye evaluaciones exprés, un sistema de recompensas y herramientas de gestión para administradores e instructores. Está desarrollada con tecnologías modernas como React, Node.js y MongoDB, siguiendo una arquitectura cliente-servidor desacoplada.
-Esta plataforma permite gestionar capacitaciones breves para empleados. Incluye un sistema de evaluaciones y recompensas, así como paneles diferenciados según el rol de cada usuario.
+**SKILL BITS** es una plataforma de microlearning empresarial que busca modernizar la capacitación de empleados mediante sesiones breves, dinámicas y accesibles. Incluye evaluaciones rápidas, un sistema de recompensas (badges) y herramientas de gestión para instructores y administradores.
 
-## Características Principales
-## Características principales
+Desarrollada con una arquitectura cliente-servidor desacoplada utilizando tecnologías modernas como **React**, **Node.js** y **MongoDB**, permite una experiencia fluida y escalable.
 
-### Para Empleados (Usuarios Finales)
-- **Usuarios**: inscripción a capacitaciones, seguimiento de progreso y obtención de insignias.
-- **Capacitadores**: creación y administración de cursos y evaluaciones.
-- **Administradores**: gestión global de usuarios y capacitaciones.
+---
 
-- 📚 Acceso a cursos y microlecciones.
-- 🏆 Sistema de badges y recompensas por progreso.
-- 📊 Visualización de historial de cursos completados.
-- 🔍 Sugerencias de cursos basadas en intereses.
-## Tecnologías
+## 🚀 Características Principales
 
-### Para Instructores
-- **Frontend**: React + Vite, TypeScript y Tailwind CSS.
-- **Backend**: Node.js, Express y MongoDB.
-- **Autenticación**: JSON Web Tokens (JWT) y bcrypt.
+### 👩‍💼 Para Usuarios (Empleados)
+- Inscripción a capacitaciones.
+- Seguimiento de progreso y logros.
+- Obtención de insignias por participación.
+- Sugerencias de cursos según intereses.
+- Historial de cursos completados.
 
-- ✏️ Creación, edición y eliminación de cursos.
-- 📝 Subida de evaluaciones con preguntas y respuestas.
-- 📈 Monitoreo de resultados y feedback de usuarios.
-## Estructura del repositorio
+### 🎓 Para Capacitadores
+- Creación, edición y eliminación de cursos.
+- Subida de evaluaciones con preguntas/respuestas.
+- Monitoreo de resultados y feedback de usuarios.
 
-### Para Administradores
+### 🛠️ Para Administradores
+- Gestión global de usuarios y asignación de roles.
+- Supervisión de capacitaciones y recompensas.
+- Dashboard con métricas de uso y actividad.
+
+---
+
+## 🧰 Tecnologías Utilizadas
+### Frontend
+- **React.js** + **Vite** + **TypeScript**
+- **Tailwind CSS**
+- **shadcn/ui** y **Aceternity UI** para componentes UI
+
+### Backend
+- **Node.js** + **Express**
+- **MongoDB**
+- **Autenticación**: JSON Web Tokens (JWT) y bcrypt
+
+---
+## 📁 Estructura del Repositorio
 ```
 plataforma-microlearning/
 ├── backend/   # API Express y modelos de MongoDB
 └── frontend/  # Aplicación React + Vite
 ```
+## ⚙️ Configuración de Entorno
+### Backend
+Crear un archivo `.env` en la carpeta `backend` con el siguiente contenido:
 
-- 👥 Gestión de usuarios y asignación de roles.
-- 📉 Dashboard con métricas de uso y actividad.
-- 🏅 Supervisión de recompensas y categorías de cursos.
-## Configuración de entorno
+```env
+MONGO_URI=<cadena de conexión a MongoDB>
+JWT_SECRET=<secreto para firmar los JWT>
+PORT=5000  # (opcional)
+```
 
-## Tecnologías Utilizadas
-En la carpeta `backend` crear un archivo `.env` con las siguientes variables:
 
 ### Frontend
+No requiere variables de entorno por defecto. La URL base de la API es http://localhost:5000. Puedes modificarla en los archivos frontend/src/services/*.ts si alojas el backend en otro lugar.
+
+## 🛠️ Instalación y Ejecución
+En ambas carpetas (frontend y backend), ejecutar:
 ```
-MONGO_URI=<cadena de conexión de MongoDB>
-JWT_SECRET=<secreto para firmar JWT>
-PORT=5000 # opcional
+npm install  # o pnpm install
 ```
-
-- **React.js** con **Vite** y **TypeScript** para una interfaz dinámica y robusta.
-- **Tailwind CSS** para estilos eficientes y responsivos.
-- **shadcn/ui** y **Aceternity UI** para componentes visuales atractivos.
-La aplicación frontend no requiere variables de entorno, aunque los servicios usan la URL `http://localhost:5000` para la API. Modifica esa dirección en `frontend/src/services/*.ts` si el backend se aloja en otra ubicación.
-
-### Backend
-## Instalación
-
-- **Node.js** con **Express** para la lógica del servidor.
-- **MongoDB** como base de datos NoSQL flexible y escalable.
-- **JWT** y **bcrypt** para autenticación segura.
-Ejecutar los siguientes comandos en cada carpeta (`backend` y `frontend`):
-
-### Despliegue
-```bash
-npm install     # o pnpm install
+### Modo Desarrollo
+Backend
 ```
-
-- **Vercel** para el frontend.
-- **Render** para el backend y la base de datos.
-## Ejecución en desarrollo
-
-## Autores
-En `backend`:
-
-```bash
 npm run dev
 ```
-
-En `frontend`:
-
-```bash
+Frontend
+```
 npm run dev
 ```
-
-## Construcción para producción
-
-```bash
+Construcción para Producción
+```
 npm run build
 ```
 
-Opcionalmente se pueden desplegar los proyectos: el frontend en **Vercel** y el backend en **Render** o cualquier plataforma compatible con Node.js.
+## ☁️ Despliegue
+
+- **Vercel** para el frontend.
+- **Render** para el backend y la base de datos.
+
+
 
 ## Roles y navegación
 
