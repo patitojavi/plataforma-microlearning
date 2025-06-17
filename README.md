@@ -58,7 +58,9 @@ PORT=5000  # (opcional)
 ```
 ### Frontend
 ```
-No requiere variables de entorno por defecto. La URL base de la API es http://localhost:5000. Puedes modificarla en los archivos frontend/src/services/*.ts si alojas el backend en otro lugar.
+No requiere variables de entorno por defecto.
+La URL base de la API es http://localhost:5000.
+Puedes modificarla en los archivos frontend/src/services/*.ts si alojas el backend en otro lugar.
 ```
 
 ---
