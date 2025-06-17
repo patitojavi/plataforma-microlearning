@@ -100,26 +100,25 @@ npm run build
 
 ---
 
-## Principales rutas de la API
+## 📡 Principales rutas de la API
 
-- **Autenticación**
+- 🔐 **Autenticación**
   - `POST /api/auth/register`
   - `POST /api/auth/login`
-- **Usuarios**
+- 👥 **Usuarios**
   - `GET /api/usuarios` (solo admin)
   - `GET /api/usuarios/:id` (solo admin)
   - `PUT /api/usuarios/:id` y `DELETE /api/usuarios/:id` (solo admin)
-- **Capacitaciones**
+- 📚 **Capacitaciones**
   - `POST /api/capacitaciones` (admin/capacitador)
   - `GET /api/capacitaciones`
   - `POST /api/capacitaciones/:id/unirse`
-- **Evaluaciones**
+- 📝 **Evaluaciones**
   - `POST /api/evaluaciones` (admin/capacitador)
   - `POST /api/evaluaciones/responder`
 
 ---
 ## 👨‍💻 Autores
-
 
 - **Patricio Benavides** - **Backend/API**
 - **Nelson Neculhueque** - **Frontend Cliente**
