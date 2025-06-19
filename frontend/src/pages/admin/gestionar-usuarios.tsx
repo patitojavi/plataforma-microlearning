@@ -24,16 +24,7 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import AppNavbar from "@/components/NavbarAdmin";
 import { getUsuarios, deleteUsuario, updateUsuario } from "@/services/usuarios";
-
-interface User {
-    id: string;
-    email: string;
-    username: string;
-    rut: string;
-    role: string;
-    // createdAt: string;
-    // lastLogin: string;
-}
+import { type UserData } from "@/services/auth";
 
 interface Course {
     id: string;
@@ -47,14 +38,13 @@ interface DailyActivity {
     logins: number;
 }
 export default function ManageUsersPage() {
-    const [users, setUsers] = useState<User[]>([]);
-    const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const [users, setUsers] = useState<UserData[]>([]);
+    const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
     const [userCourses, setUserCourses] = useState<Course[]>([]);
     const [activityData, setActivityData] = useState<DailyActivity[]>([]);
     const [editForm, setEditForm] = useState({
         email: "",
         username: "",
-        rut: "",
         role: "",
     });
 
@@ -89,7 +79,7 @@ export default function ManageUsersPage() {
 
     const fetchUsers = async () => {
         try {
-            const token = localStorage.getItem("token") || ""; // Replace with actual token
+            const token = localStorage.getItem("token") || "";
             const usuarios = await getUsuarios(token);
             setUsers(usuarios);
         } catch (error) {
@@ -97,12 +87,11 @@ export default function ManageUsersPage() {
         }
     };
 
-    const handleInspect = (user: User) => {
+    const handleInspect = (user: UserData) => {
         setSelectedUser(user);
         setEditForm({
             email: user.email,
             username: user.username,
-            rut: user.rut,
             role: user.role,
         });
     };
@@ -111,7 +100,7 @@ export default function ManageUsersPage() {
         try {
             const token = localStorage.getItem("token") || "";
             await deleteUsuario(userId, token);
-            setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
+            setUsers((prevUsers) => prevUsers.filter((user) => user._id !== userId));
             setSelectedUser(null);
             alert("Usuario eliminado correctamente");
         } catch (error) {
@@ -127,13 +116,12 @@ export default function ManageUsersPage() {
                 ...selectedUser,
                 email: editForm.email,
                 username: editForm.username,
-                rut: editForm.rut,
                 role: editForm.role,
             };
-            await updateUsuario(selectedUser.id, updatedUser, token);
+            await updateUsuario(selectedUser._id, updatedUser, token);
             setUsers((prevUsers) =>
                 prevUsers.map((user) =>
-                    user.id === selectedUser.id ? updatedUser : user
+                    user._id === selectedUser._id ? updatedUser : user
                 )
             );
             setSelectedUser(updatedUser);
@@ -168,6 +156,7 @@ export default function ManageUsersPage() {
                         <Table>
                             <TableHeader>
                                 <TableRow>
+                                    <TableHead>ID</TableHead>
                                     <TableHead>Nombre</TableHead>
                                     <TableHead>Email</TableHead>
                                     <TableHead>RUT</TableHead>
@@ -179,7 +168,8 @@ export default function ManageUsersPage() {
                             </TableHeader>
                             <TableBody>
                                 {users.map((user) => (
-                                    <TableRow key={user.id}>
+                                    <TableRow key={user._id}>
+                                        <TableCell>{user._id}</TableCell>
                                         <TableCell>{user.username}</TableCell>
                                         <TableCell>{user.email}</TableCell>
                                         <TableCell>{user.rut}</TableCell>
@@ -306,7 +296,7 @@ export default function ManageUsersPage() {
                                                         <Button onClick={handleUpdateUser}>Guardar Cambios</Button>
                                                         <Button
                                                             variant="destructive"
-                                                            onClick={() => handleDeleteUser(selectedUser.id)}
+                                                            onClick={() => handleDeleteUser(selectedUser._id)}
                                                         >
                                                             Eliminar Usuario
                                                         </Button>

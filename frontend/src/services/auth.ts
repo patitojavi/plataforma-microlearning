@@ -14,7 +14,7 @@ interface AuthResponse {
 }
 
 export interface UserData {
-  id: string;
+  _id: string;
   email: string;
   username: string;
   rut: string;
@@ -43,7 +43,7 @@ export const getCurrentUser = (): UserData | null => {
   try {
     const payload = JSON.parse(atob(token.split('.')[1]));
     return {
-      id: payload.id,
+      _id: payload.id,
       email: payload.email,
       username: payload.username,
       rut: payload.rut,

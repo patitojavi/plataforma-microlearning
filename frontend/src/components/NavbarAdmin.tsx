@@ -66,12 +66,11 @@ export default function AppNavbar() {
   if (role === "admin") {
     menuItems.push(
       { name: "Gestionar Usuario", path: "/admin/gestionar-usuario" },
-      { name: "Gestionar Cursos", path: "/admin/gestionar-cursos" }
+      { name: "Gestionar Capacitaciones", path: "/admin/gestionar-capacitaciones" }
     );
   } else if (role === "capacitador") {
     menuItems.push(
-      { name: "Gestionar Cursos", path: "/capacitador/cursos" },
-      { name: "Evaluaciones", path: "/evaluaciones" }
+      { name: "Capacitaciones", path: "/capacitador/capacitaciones" },
     );
   }
 

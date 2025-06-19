@@ -51,7 +51,7 @@ export default function RouterApp() {
           <ManageUsersPage />
         </PrivateRoute>
       } />
-      <Route path="/admin/gestionar-cursos" element={
+      <Route path="/admin/gestionar-capacitaciones" element={
         <PrivateRoute allowedRoles={["admin"]}>
           <ManageCoursesPage />
         </PrivateRoute>
@@ -63,7 +63,7 @@ export default function RouterApp() {
           <CapacitadorPage />
         </PrivateRoute>
       } />
-      <Route path="/capacitador/cursos" element={
+      <Route path="/capacitador/capacitaciones" element={
         <PrivateRoute allowedRoles={["capacitador"]}>
           <CapacitadorCursos />
         </PrivateRoute>
