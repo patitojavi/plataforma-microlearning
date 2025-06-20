@@ -66,6 +66,7 @@ export default function AppNavbar() {
   const menuItems = [
     { name: "Capacitaciones", path: "/capacitaciones" },
     { name: "Responder Evaluación", path: "/responder" },
+    { name: "Historial de Cursos", path: "/historial" },
   ];
 
   return (
