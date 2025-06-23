@@ -27,6 +27,7 @@ export default function Login() {
       // Guardar token e información del usuario autenticado
       localStorage.setItem("token", res.token);
       setUsuario({
+        _id: res.user._id, 
         nombre: res.user.username,
         email: res.user.email,
         rut: res.user.rut,
