@@ -47,3 +47,14 @@ export const eliminarUsuario = async (req: Request, res: Response): Promise<void
     res.status(500).json({ message: 'Error al eliminar usuario' });
   }
 };
+
+export const obtenerBadgesUsuario = async (req: Request, res: Response): Promise<void> => {
+  const { id } = req.params;
+  try {
+    const user = await User.findById(id).select('badges');
+    if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
+    res.json({ badges: user.badges || [] });
+  } catch {
+    res.status(500).json({ message: 'Error al obtener insignias del usuario' });
+  }
+};

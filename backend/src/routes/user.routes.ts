@@ -5,7 +5,8 @@ import {
   obtenerUsuarios,
   obtenerUsuario,
   actualizarUsuario,
-  eliminarUsuario
+  eliminarUsuario,
+  obtenerBadgesUsuario
 } from '../controllers/user.controller';
 
 const router = Router();
@@ -42,5 +43,7 @@ router.get('/normal', verifyToken, (req, res) => {
 });
 // Eliminar un usuario
 router.delete('/:id', verifyToken, verifyRole(['admin']), eliminarUsuario);
+
+router.get('/:id/badges', verifyToken, obtenerBadgesUsuario);
 
 export default router;
