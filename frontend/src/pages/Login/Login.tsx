@@ -1,4 +1,3 @@
-"use client";
 
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
@@ -12,15 +11,20 @@ import { cn } from "../../lib/utils";
 import { useAuth } from "../../context/AuthContext";
 
 export default function Login() {
+  // Estado para correo y contraseña
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate();
-  const { setUsuario } = useAuth(); 
 
+  const navigate = useNavigate();
+  const { setUsuario } = useAuth(); // Acceso al contexto de autenticación
+
+  // Función que maneja el inicio de sesión al enviar el formulario
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const res = await login({ email, password });
+
+      // Guardar token e información del usuario autenticado
       localStorage.setItem("token", res.token);
       setUsuario({
         nombre: res.user.username,
@@ -28,6 +32,8 @@ export default function Login() {
         rut: res.user.rut,
         role: res.user.role,
       });
+
+      // Redirige a la vista principal
       navigate("/capacitaciones");
     } catch {
       alert("Credenciales inválidas");
@@ -36,23 +42,30 @@ export default function Login() {
 
   return (
     <AuroraBackground>
+      {/* Contenedor animado del formulario */}
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.7, duration: 0.8, ease: "easeInOut" }}
         className="relative flex flex-col items-center justify-center px-6 gap-8 max-w-xl mx-auto"
       >
+        {/* Título de bienvenida */}
         <h1 className="text-4xl md:text-5xl font-extrabold text-center max-w-md bg-gradient-to-r text-white bg-clip-text drop-shadow-lg leading-tight">
           Bienvenido 
         </h1>
-        
+
+        {/* Tarjeta 3D con el formulario */}
         <CardContainer className="inter-var w-full z-10">
           <CardBody className="bg-[#0f172a]/85 backdrop-blur-md border border-gray-400/30 rounded-xl px-8 py-14 shadow-md w-full max-w-2xl mx-auto overflow-visible min-h-[450px]">
+            
+            {/* Título del formulario */}
             <CardItem translateZ={50} className="text-3xl font-bold text-white select-none mb-8">
               Iniciar sesión
             </CardItem>
 
             <form onSubmit={handleLogin} className="flex flex-col space-y-5 w-full mx-auto">
+              
+              {/* Campo de correo electrónico */}
               <CardItem translateZ={40} className="w-full flex flex-col">
                 <LabelInputContainer>
                   <Label htmlFor="email" className="text-white">
@@ -70,6 +83,7 @@ export default function Login() {
                 </LabelInputContainer>
               </CardItem>
 
+              {/* Campo de contraseña */}
               <CardItem translateZ={40} className="w-full flex flex-col">
                 <LabelInputContainer>
                   <Label htmlFor="password" className="text-white">
@@ -87,6 +101,7 @@ export default function Login() {
                 </LabelInputContainer>
               </CardItem>
 
+              {/* Botón de enviar */}
               <CardItem translateZ={30} className="w-full flex flex-col relative">
                 <button
                   type="submit"
@@ -97,6 +112,7 @@ export default function Login() {
                 </button>
               </CardItem>
 
+              {/* Enlaces secundarios */}
               <CardItem translateZ={20} className="w-full flex flex-col text-center space-y-2 mt-4">
                 <Link to="/register" className="text-sm text-blue-400 hover:text-blue-600 transition">
                   ¿No tienes cuenta? Regístrate aquí
@@ -117,7 +133,7 @@ export default function Login() {
   );
 }
 
-// Línea brillante debajo del botón
+// Componente decorativo: línea brillante debajo del botón
 const BottomGradient = () => (
   <>
     <span className="absolute inset-x-0 -bottom-px block h-px w-full bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-0 transition duration-500 group-hover/btn:opacity-100" />
@@ -125,7 +141,7 @@ const BottomGradient = () => (
   </>
 );
 
-// Contenedor para label + input con separación
+// Contenedor reutilizable para agrupar Label + Input con espaciado
 const LabelInputContainer = ({
   children,
   className,

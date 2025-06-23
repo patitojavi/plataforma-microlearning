@@ -9,6 +9,7 @@ import { Link, useNavigate, NavLink } from "react-router-dom";
 import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
 import { useAuth } from "../context/AuthContext";
 
+// Componente de logo SVG personalizado
 export const AcmeLogo = () => (
   <svg fill="none" height="32" viewBox="0 0 32 32" width="32">
     <path
@@ -19,6 +20,7 @@ export const AcmeLogo = () => (
 );
 
 export default function AppNavbar() {
+  // Estados para menús y referencia al dropdown de cuenta
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCuentaOpen, setIsCuentaOpen] = useState(false);
   const [isCuentaMobileOpen, setIsCuentaMobileOpen] = useState(false);
@@ -27,6 +29,7 @@ export default function AppNavbar() {
   const { usuario, setUsuario } = useAuth();
   const role = usuario?.role || null;
 
+  // Cierre de sesión: limpia token, usuario y redirige a login
   const handleLogout = () => {
     localStorage.removeItem("token");
     setUsuario(null);
@@ -36,6 +39,7 @@ export default function AppNavbar() {
     navigate("/login");
   };
 
+  // Define la ruta del logo según el rol del usuario
   const getLogoRoute = () => {
     switch (role) {
       case "usuario":
@@ -45,12 +49,14 @@ export default function AppNavbar() {
     }
   };
 
+  // Redirección automática a /usuario si el usuario está autenticado
   useEffect(() => {
     if (role === "usuario" && window.location.pathname === "/") {
       navigate("/usuario");
     }
   }, [role, navigate]);
 
+  // Cierra el menú de cuenta si se hace clic fuera de él
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (cuentaRef.current && !(cuentaRef.current as any).contains(event.target)) {
@@ -63,6 +69,7 @@ export default function AppNavbar() {
     };
   }, []);
 
+  // Enlaces principales de navegación
   const menuItems = [
     { name: "Capacitaciones", path: "/capacitaciones" },
     { name: "Responder Evaluación", path: "/responder" },
@@ -71,13 +78,16 @@ export default function AppNavbar() {
 
   return (
     <>
+      {/* Barra de navegación principal (desktop y mobile) */}
       <Navbar
         className="bg-indigo-950 text-white shadow-sm"
         isBordered
         onMenuOpenChange={setIsMenuOpen}
         style={{ minHeight: "64px" }}
       >
+        {/* Contenido izquierdo del navbar */}
         <NavbarContent className="items-center">
+          {/* Botón para abrir/cerrar el menú lateral (solo en móvil) */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="sm:hidden text-xl text-white"
@@ -85,15 +95,15 @@ export default function AppNavbar() {
           >
             {isMenuOpen ? <AiOutlineClose /> : <AiOutlineMenu />}
           </button>
+
+          {/* Logo y nombre de la aplicación */}
           <NavbarBrand className="ml-1 flex items-center">
             <AcmeLogo />
             <NavLink
               to={getLogoRoute()}
               onClick={() => setIsMenuOpen(false)}
               className={({ isActive }) =>
-                `ml-2 font-semibold text-white text-base leading-none ${
-                  isActive ? "text-blue-400" : ""
-                }`
+                `ml-2 font-semibold text-white text-base leading-none ${isActive ? "text-blue-400" : ""}`
               }
             >
               SkillBits
@@ -101,6 +111,7 @@ export default function AppNavbar() {
           </NavbarBrand>
         </NavbarContent>
 
+        {/* Menú principal para pantallas grandes */}
         <NavbarContent className="hidden sm:flex flex-1 items-center" justify="between">
           <div className="flex gap-6 justify-center flex-1">
             {menuItems.map((item, index) => (
@@ -118,6 +129,7 @@ export default function AppNavbar() {
             ))}
           </div>
 
+          {/* Menú de cuenta (desktop) */}
           <NavbarItem className="relative" ref={cuentaRef}>
             <button
               onClick={() => setIsCuentaOpen(!isCuentaOpen)}
@@ -137,6 +149,7 @@ export default function AppNavbar() {
               </svg>
             </button>
 
+            {/* Dropdown del usuario */}
             {isCuentaOpen && (
               <div
                 className="absolute right-0 mt-2 w-40 bg-[#0f172a] border border-white/20 rounded shadow-lg z-50"
@@ -185,7 +198,7 @@ export default function AppNavbar() {
         </NavbarContent>
       </Navbar>
 
-      {/* Mobile Sidebar */}
+      {/* Sidebar móvil (pantallas pequeñas) */}
       <div
         className={`fixed top-0 left-0 h-full w-64 bg-indigo-950 text-white transform transition-transform duration-200 z-50 sm:hidden ${isMenuOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
@@ -200,6 +213,8 @@ export default function AppNavbar() {
             <AiOutlineClose />
           </button>
         </div>
+
+        {/* Navegación móvil */}
         <nav className="flex flex-col p-4 space-y-2">
           {menuItems.map((item, index) => (
             <NavLink
@@ -214,6 +229,7 @@ export default function AppNavbar() {
             </NavLink>
           ))}
 
+          {/* Menú de cuenta en móvil */}
           <div className="border-t border-white/20 mt-2 pt-2">
             <button
               onClick={() => setIsCuentaMobileOpen(!isCuentaMobileOpen)}
@@ -233,6 +249,7 @@ export default function AppNavbar() {
               </svg>
             </button>
 
+            {/* Dropdown usuario (mobile) */}
             {isCuentaMobileOpen && (
               <ul className="mt-1 bg-[#0f172a] rounded-md border border-white/20 shadow-lg z-50">
                 {usuario && (
