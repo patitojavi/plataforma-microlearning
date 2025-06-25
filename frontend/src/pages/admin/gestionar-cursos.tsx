@@ -25,6 +25,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import AppNavbar from "@/components/NavbarAdmin";
 import { obtenerCursos, crearCurso, eliminarCurso, type Course } from "@/services/cursos";
 import { toast } from "sonner";
+import { getUsuarios } from "@/services/usuarios";
 
 interface Comment {
   id: string;
@@ -70,13 +71,14 @@ export default function ManageCoursesPage() {
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [dailyActivity, setDailyActivity] = useState<DailyActivity[]>([]);
-  const [editForm, setEditForm] = useState({ creador: "" });
+  const [editForm, setEditForm] = useState({ capacitador: "" });
   const [createForm, setCreateForm] = useState({ titulo: "", descripcion: "", creador: "" });
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [users, setUsers] = useState<{ _id: string; username: string; role: string }[]>([]);
 
   useEffect(() => {
     fetchCourses();
-
+    fetchUsers();
     setComments([
       { id: "c1", user: "Usuario1", text: "Excelente curso", date: "2023-06-15" },
       { id: "c2", user: "Usuario2", text: "Faltan ejemplos prácticos", date: "2023-06-18" }
@@ -97,20 +99,39 @@ export default function ManageCoursesPage() {
     try {
       const token = localStorage.getItem("token") || "";
       const cursos = await obtenerCursos(token);
+      // const comentarios = cursos.flatMap(course =>
+      //   course.comentarios.map(comment => ({
+      //     id: comment._id,
+      //     user: comment.usuario?.username || "Anónimo",
+      //     text: comment.texto,
+      //     date: new Date(comment.fecha).toLocaleDateString(),
+      //   })) || []
+      // );
       setCourses(cursos);
     } catch (error) {
       console.error("Error al cargar capacitaciones:", error);
     }
   };
 
+  const fetchUsers = async () => {
+    try {
+      const token = localStorage.getItem("token") || "";
+      const users = await getUsuarios(token);
+      const filteredUsers = users.filter(user => user.role === "capacitador");
+      setUsers(filteredUsers);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  };
+
   const handleInspect = (course: Course) => {
     setSelectedCourse(course);
-    setEditForm({ creador: course.creador?.username || "" });
+    setEditForm({ capacitador: course.creador?.username || "" });
   };
 
   const handleCloseInspection = () => {
     setSelectedCourse(null);
-    setEditForm({ creador: "" });
+    setEditForm({ capacitador: "" });
   };
 
   const handleCreateCourse = async () => {
@@ -130,14 +151,14 @@ export default function ManageCoursesPage() {
       setShowCreateForm(false);
       setCreateForm({ titulo: "", descripcion: "", creador: "" });
       toast.success("Capacitación creada correctamente", {
-          position: "top-center",
-          duration: 3000,
+        position: "top-center",
+        duration: 3000,
       });
     } catch (error) {
       console.error("Error al crear capacitación:", error);
       toast.error("Error al crear capacitación", {
-          position: "top-center",
-          duration: 3000,
+        position: "top-center",
+        duration: 3000,
       });
     }
   };
@@ -149,14 +170,14 @@ export default function ManageCoursesPage() {
       await fetchCourses();
       setSelectedCourse(null);
       toast.success("Capacitación eliminada correctamente", {
-          position: "top-center",
-          duration: 3000,
+        position: "top-center",
+        duration: 3000,
       });
     } catch (error) {
       console.error("Error al eliminar capacitación:", error);
       toast.error("Error al eliminar capacitación", {
-          position: "top-center",
-          duration: 3000,
+        position: "top-center",
+        duration: 3000,
       });
     }
   };
@@ -395,15 +416,23 @@ export default function ManageCoursesPage() {
                       <CardContent>
                         <div className="space-y-4">
                           <div>
-                            <Label htmlFor="instructor">Capacitador</Label>
-                            <Input
-                              id="instructor"
-                              value={editForm.creador}
+                            <Label htmlFor="role">Rol</Label>
+                            <select
+                              id="role"
+                              value={editForm.capacitador}
                               onChange={(e) =>
-                                setEditForm({ ...editForm, creador: e.target.value })
+                                setEditForm({ ...editForm, capacitador: e.target.value })
                               }
-                              placeholder="Nombre del capacitador"
-                            />
+                              className="w-full p-2 border rounded"
+                            >
+                              <option value="">Seleccionar Capacitador</option>
+                              {users
+                                .map((user) => (
+                                  <option key={user._id} value={user.username}>
+                                    {user.username}
+                                  </option>
+                                ))}
+                            </select>
                           </div>
                           <div className="flex justify-between pt-4">
                             <Button onClick={() => handleCloseInspection()}>

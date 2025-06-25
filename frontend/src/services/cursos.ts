@@ -65,3 +65,5 @@ export const eliminarCurso = async (id: string, token: string) => {
     throw error;
   }
 };
+
+ 
