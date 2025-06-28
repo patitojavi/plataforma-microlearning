@@ -8,11 +8,13 @@ import {
 
 // Tipo de usuario
 interface Usuario {
+  _id: string;
   nombre: string;
   email: string;
   rut: string;
   role: string;
 }
+
 
 // Tipo del contexto
 interface AuthContextType {
