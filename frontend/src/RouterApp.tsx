@@ -3,8 +3,9 @@ import { Routes, Route } from 'react-router-dom';
 import App from './App';
 import Login from './pages/Login/Login';
 import Register from './pages/Register/Register';
-import Capacitaciones from './pages/Capacitaciones';
-import ResponderEvaluacion from './pages/ResponderEvaluacion';
+import Capacitaciones from './pages/usuario/Capacitaciones';
+import ResponderEvaluacion from './pages/usuario/ResponderEvaluacion';
+import HistorialCursos from './pages/usuario/historial';
 import Perfil from './pages/Perfil/Perfil';
 import UsuarioPage from './pages/usuario/usuarioPage';
 import AdminPage from './pages/admin/admin-page';
@@ -39,7 +40,11 @@ export default function RouterApp() {
           <ResponderEvaluacion />
         </PrivateRoute>
       } />
-
+      <Route path="/historial" element={
+        <PrivateRoute allowedRoles={["usuario"]}>
+          <HistorialCursos />
+        </PrivateRoute>
+      } />
       {/* Rutas protegidas - admin */}
       <Route path="/admin" element={
         <PrivateRoute allowedRoles={["admin"]}>
