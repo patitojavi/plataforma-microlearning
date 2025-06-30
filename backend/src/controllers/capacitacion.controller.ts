@@ -4,10 +4,17 @@ import { AuthRequest } from '../middlewares/auth.middleware';
 
 export const crearCapacitacion = async (req: AuthRequest, res: Response) => {
   try {
-    const { titulo, descripcion, contenido } = req.body;
+    const { titulo, descripcion, contenido, videoUrl, comentarios } = req.body;
     const creador = req.user?.id;
 
-    const nueva = new Capacitacion({ titulo, descripcion, contenido, creador });
+    const nueva = new Capacitacion({
+      titulo,
+      descripcion,
+      contenido,
+      creador,
+      videoUrl,
+      comentarios: comentarios || []
+    });
     await nueva.save();
 
     res.status(201).json(nueva);
@@ -16,9 +23,25 @@ export const crearCapacitacion = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export const obtenerCapacitaciones = async (_req: Request, res: Response) => {
-  const capacitaciones = await Capacitacion.find().populate('creador', 'username');
-  res.json(capacitaciones);
+export const obtenerCapacitaciones = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const capacitaciones = await Capacitacion.find().populate('creador', 'username');
+
+    const resultado = capacitaciones.map(cap => {
+      const esCapacitador = cap.creador._id.toString() === userId;
+      const yaInscrito = cap.miembros.map(id => id.toString()).includes(userId);
+      return {
+        ...cap.toObject(),
+        esCapacitador,
+        yaInscrito
+      };
+    });
+
+    res.json(resultado);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al obtener capacitaciones' });
+  }
 };
 
 export const unirseACapacitacion = async (req: AuthRequest, res: Response) => {
@@ -79,3 +102,26 @@ export const eliminarCapacitacion = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ message: 'Error al eliminar capacitación' });
   }
 };
+
+
+export const actualizarCapacitacion = async (req: AuthRequest, res: Response) => {
+  const { id } = req.params;
+  const { titulo, descripcion, contenido } = req.body;
+
+  try {
+    const actualizada = await Capacitacion.findByIdAndUpdate(
+      id,
+      { titulo, descripcion, contenido },
+      { new: true }
+    );
+    if (!actualizada) {
+      return res.status(404).json({ message: 'Capacitación no encontrada' });
+    }
+
+    res.json(actualizada);
+  } catch (err) {
+    console.error('Error al actualizar capacitación:', err);
+    res.status(500).json({ message: 'Error al actualizar capacitación' });
+  }
+};
+
