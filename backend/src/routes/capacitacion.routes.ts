@@ -7,7 +7,8 @@ import {
   unirseACapacitacion,
   verMiembros,
   verProgreso,
-  eliminarCapacitacion
+  eliminarCapacitacion,
+  actualizarCapacitacion
 } from '../controllers/capacitacion.controller';
 
 const router = Router();
@@ -29,6 +30,8 @@ router.get('/:id/progreso', verifyToken, verProgreso);
 
 // Eliminar una capacitación (solo admin)
 router.delete('/:id', verifyToken, verifyRole(['admin']), eliminarCapacitacion);
+
+router.put('/:id', verifyToken, verifyRole(['admin', 'capacitador']), actualizarCapacitacion);
 
 
 
