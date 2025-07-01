@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/auth';
+const API_URL = 'https://plataforma-microlearning-x4bz.onrender.com/api/auth';
 
 interface AuthResponse {
   token: string;

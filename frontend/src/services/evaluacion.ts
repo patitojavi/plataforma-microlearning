@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/evaluaciones';
+const API_URL = 'https://plataforma-microlearning-x4bz.onrender.com/api/evaluaciones';
 
 export const crearEvaluacion = async (data: {
   capacitacionId: string;

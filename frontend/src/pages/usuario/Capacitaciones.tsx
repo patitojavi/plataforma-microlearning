@@ -19,7 +19,7 @@ export default function Capacitaciones() {
   useEffect(() => {
     const fetchCapacitaciones = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/capacitaciones');
+        const res = await axios.get('https://plataforma-microlearning-x4bz.onrender.com/api/capacitaciones');
         setCapacitaciones(res.data);
       } catch (err) {
         console.error('Error al obtener capacitaciones', err);
@@ -39,14 +39,14 @@ export default function Capacitaciones() {
     try {
       // Solicitud para unirse
       await axios.post(
-        `http://localhost:5000/api/capacitaciones/${id}/unirse`,
+        `https://plataforma-microlearning-x4bz.onrender.com//api/capacitaciones/${id}/unirse`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       // Obtener progreso luego de unirse
       const progresoRes = await axios.get(
-        `http://localhost:5000/api/capacitaciones/${id}/progreso`,
+        `https://plataforma-microlearning-x4bz.onrender.com//api/capacitaciones/${id}/progreso`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -66,7 +66,7 @@ export default function Capacitaciones() {
 
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/capacitaciones/${id}/progreso`,
+        `https://plataforma-microlearning-x4bz.onrender.com//api/capacitaciones/${id}/progreso`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       alert(`Tu progreso en esta capacitación es: ${res.data.progreso}%`);

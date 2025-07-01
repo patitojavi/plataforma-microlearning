@@ -14,7 +14,7 @@ export default function PerfilCliente() {
       try {
         const token = localStorage.getItem("token");
         const res = await axios.get(
-          `http://localhost:5000/api/usuarios/${usuario._id}/badges`,
+          `https://plataforma-microlearning-x4bz.onrender.com/api/usuarios/${usuario._id}/badges`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         if (Array.isArray(res.data.badges)) {

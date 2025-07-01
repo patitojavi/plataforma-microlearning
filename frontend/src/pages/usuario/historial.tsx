@@ -22,7 +22,7 @@ export default function HistorialCursos() {
 
       try {
         // Obtener todas las capacitaciones
-        const res = await axios.get('http://localhost:5000/api/capacitaciones', {
+        const res = await axios.get('https://plataforma-microlearning-x4bz.onrender.com/api/capacitaciones', {
           headers: { Authorization: `Bearer ${token}` }
         });
 
