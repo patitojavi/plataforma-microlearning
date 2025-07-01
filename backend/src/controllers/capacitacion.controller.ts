@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { Capacitacion } from '../models/capacitacion.model';
 import { AuthRequest } from '../middlewares/auth.middleware';
+import mongoose from 'mongoose';
 
 export const crearCapacitacion = async (req: AuthRequest, res: Response) => {
   try {
@@ -30,7 +31,7 @@ export const obtenerCapacitaciones = async (req: AuthRequest, res: Response) => 
 
     const resultado = capacitaciones.map(cap => {
       const esCapacitador = cap.creador._id.toString() === userId;
-      const yaInscrito = cap.miembros.map(id => id.toString()).includes(userId);
+      const yaInscrito = userId ? cap.miembros.map(id => id.toString()).includes(userId) : false;
       return {
         ...cap.toObject(),
         esCapacitador,
@@ -48,14 +49,18 @@ export const unirseACapacitacion = async (req: AuthRequest, res: Response) => {
   const userId = req.user?.id;
   const { id } = req.params;
 
+  if (!userId) {
+    return res.status(400).json({ message: 'Usuario no autenticado' });
+  }
+
   const cap = await Capacitacion.findById(id);
   if (!cap) return res.status(404).json({ message: 'Capacitación no encontrada' });
 
-  if (cap.miembros.includes(userId)) {
+  if (cap.miembros.map(id => id.toString()).includes(userId)) {
     return res.status(400).json({ message: 'Ya estás inscrito en esta capacitación' });
   }
 
-  cap.miembros.push(userId);
+  cap.miembros.push(new mongoose.Types.ObjectId(userId));
   cap.progreso.set(userId, 0);
   await cap.save();
 
@@ -70,10 +75,13 @@ export const verMiembros = async (req: Request, res: Response) => {
   res.json(cap.miembros);
 };
 
-
 export const verProgreso = async (req: AuthRequest, res: Response) => {
   const userId = req.user?.id;
   const { id } = req.params;
+
+  if (!userId) {
+    return res.status(400).json({ message: 'Usuario no autenticado' });
+  }
 
   const cap = await Capacitacion.findById(id);
   if (!cap) return res.status(404).json({ message: 'Capacitación no encontrada' });
@@ -85,8 +93,6 @@ export const verProgreso = async (req: AuthRequest, res: Response) => {
   const progreso = cap.progreso.get(userId);
   res.json({ progreso });
 };
-
-
 
 export const eliminarCapacitacion = async (req: AuthRequest, res: Response) => {
   const { id } = req.params;
@@ -103,15 +109,14 @@ export const eliminarCapacitacion = async (req: AuthRequest, res: Response) => {
   }
 };
 
-
 export const actualizarCapacitacion = async (req: AuthRequest, res: Response) => {
   const { id } = req.params;
-  const { titulo, descripcion, contenido } = req.body;
+  const { titulo, descripcion, contenido, videoUrl, comentarios } = req.body;
 
   try {
     const actualizada = await Capacitacion.findByIdAndUpdate(
       id,
-      { titulo, descripcion, contenido },
+      { titulo, descripcion, contenido, videoUrl, comentarios },
       { new: true }
     );
     if (!actualizada) {
@@ -124,4 +129,3 @@ export const actualizarCapacitacion = async (req: AuthRequest, res: Response) =>
     res.status(500).json({ message: 'Error al actualizar capacitación' });
   }
 };
-

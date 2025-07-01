@@ -1,27 +1,31 @@
 import { Request, Response } from 'express';
 import { User } from '../models/user.model';
 
-export const obtenerUsuarios = async (_req: Request, res: Response): Promise<void> => {
+export const obtenerUsuarios = async (_req: Request, res: Response) => {
   try {
     const users = await User.find().select('-password');
-    res.json(users);
-  } catch {
-    res.status(500).json({ message: 'Error al obtener usuarios' });
+    return res.json(users);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Error al obtener usuarios' });
   }
 };
 
-export const obtenerUsuario = async (req: Request, res: Response): Promise<void> => {
+export const obtenerUsuario = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     const user = await User.findById(id).select('-password');
-    if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
-    res.json(user);
-  } catch {
-    res.status(500).json({ message: 'Error al obtener usuario' });
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+    return res.json(user);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Error al obtener usuario' });
   }
 };
 
-export const actualizarUsuario = async (req: Request, res: Response): Promise<void> => {
+export const actualizarUsuario = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { email, username, role } = req.body;
   try {
@@ -30,31 +34,41 @@ export const actualizarUsuario = async (req: Request, res: Response): Promise<vo
       { email, username, role },
       { new: true }
     ).select('-password');
-    if (!updated) return res.status(404).json({ message: 'Usuario no encontrado' });
-    res.json(updated);
-  } catch {
-    res.status(500).json({ message: 'Error al actualizar usuario' });
+
+    if (!updated) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+    return res.json(updated);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Error al actualizar usuario' });
   }
 };
 
-export const eliminarUsuario = async (req: Request, res: Response): Promise<void> => {
+export const eliminarUsuario = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     const deleted = await User.findByIdAndDelete(id);
-    if (!deleted) return res.status(404).json({ message: 'Usuario no encontrado' });
-    res.json({ message: 'Usuario eliminado' });
-  } catch {
-    res.status(500).json({ message: 'Error al eliminar usuario' });
+    if (!deleted) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+    return res.json({ message: 'Usuario eliminado' });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Error al eliminar usuario' });
   }
 };
 
-export const obtenerBadgesUsuario = async (req: Request, res: Response): Promise<void> => {
+export const obtenerBadgesUsuario = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     const user = await User.findById(id).select('badges');
-    if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
-    res.json({ badges: user.badges || [] });
-  } catch {
-    res.status(500).json({ message: 'Error al obtener insignias del usuario' });
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+    return res.json({ badges: user.badges || [] });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Error al obtener insignias del usuario' });
   }
 };
