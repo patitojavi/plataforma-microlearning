@@ -3,6 +3,9 @@ import { Capacitacion } from '../models/capacitacion.model';
 import { AuthRequest } from '../middlewares/auth.middleware';
 import mongoose from 'mongoose';
 
+
+// Crear una nueva capacitación
+// Solo accesible por administradores o capacitadores
 export const crearCapacitacion = async (req: AuthRequest, res: Response) => {
   try {
     const { titulo, descripcion, contenido, videoUrl, comentarios } = req.body;
@@ -24,6 +27,9 @@ export const crearCapacitacion = async (req: AuthRequest, res: Response) => {
   }
 };
 
+
+// Obtener todas las capacitaciones
+// Devuelve un listado de capacitaciones con información adicional sobre el usuario
 export const obtenerCapacitaciones = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.id;
@@ -45,6 +51,10 @@ export const obtenerCapacitaciones = async (req: AuthRequest, res: Response) => 
   }
 };
 
+
+
+// Unirse a una capacitación
+// Permite a un usuario autenticado unirse a una capacitación
 export const unirseACapacitacion = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user?.id;
@@ -80,7 +90,8 @@ export const unirseACapacitacion = async (req: AuthRequest, res: Response): Prom
 
 
 
-
+// Ver miembros de una capacitación
+// Solo accesible por administradores o capacitadores
 export const verMiembros = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -102,7 +113,9 @@ export const verMiembros = async (req: Request, res: Response): Promise<void> =>
 
 
 
-
+// Ver progreso de una capacitación
+// Permite a un usuario autenticado ver su progreso en una capacitación
+// El progreso se almacena como un mapa de usuario a porcentaje completado
 export const verProgreso = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user?.id;
@@ -133,7 +146,8 @@ export const verProgreso = async (req: AuthRequest, res: Response): Promise<void
 };
 
 
-
+// Eliminar una capacitación
+// Solo accesible por administradores
 export const eliminarCapacitacion = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -154,7 +168,8 @@ export const eliminarCapacitacion = async (req: AuthRequest, res: Response): Pro
 
 
 
-
+// Actualizar una capacitación
+// Solo accesible por administradores o capacitadores
 export const actualizarCapacitacion = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;

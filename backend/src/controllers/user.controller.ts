@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { User } from '../models/user.model';
 
+
+// Registrar un nuevo usuario
 export const obtenerUsuarios = async (_req: Request, res: Response): Promise<void> => {
   try {
     const users = await User.find().select('-password');
@@ -11,6 +13,8 @@ export const obtenerUsuarios = async (_req: Request, res: Response): Promise<voi
   }
 };
 
+
+// Obtener un usuario por ID
 export const obtenerUsuario = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
   try {
@@ -26,6 +30,8 @@ export const obtenerUsuario = async (req: Request, res: Response): Promise<void>
   }
 };
 
+
+// Actualizar un usuario
 export const actualizarUsuario = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
   const { email, username, role } = req.body;
@@ -48,6 +54,8 @@ export const actualizarUsuario = async (req: Request, res: Response): Promise<vo
   }
 };
 
+
+// Eliminar un usuario
 export const eliminarUsuario = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
   try {
@@ -63,6 +71,8 @@ export const eliminarUsuario = async (req: Request, res: Response): Promise<void
   }
 };
 
+
+// Obtener badges de un usuario
 export const obtenerBadgesUsuario = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
   try {
@@ -77,3 +87,7 @@ export const obtenerBadgesUsuario = async (req: Request, res: Response): Promise
     res.status(500).json({ message: 'Error al obtener insignias del usuario' });
   }
 };
+
+
+
+

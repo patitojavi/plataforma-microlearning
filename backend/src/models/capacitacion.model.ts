@@ -7,8 +7,8 @@ export interface ICapacitacion extends mongoose.Document {
   descripcion: string;
   creador: mongoose.Types.ObjectId;
   miembros: mongoose.Types.ObjectId[];
-  contenido: string[]; // Lista de módulos o links
-  progreso: Map<string, number>; // userId: % progreso
+  contenido: string[]; 
+  progreso: Map<string, number>; 
   videoUrl?: string;
   comentarios: string[];
 }
