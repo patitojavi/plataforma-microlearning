@@ -24,10 +24,11 @@ export default function AppNavbar() {
   const [isCuentaOpen, setIsCuentaOpen] = useState(false);
   const [isCuentaMobileOpen, setIsCuentaMobileOpen] = useState(false);
   const navigate = useNavigate();
-  const cuentaRef = useRef(null);
   const user = getCurrentUser();
-  const { usuario, setUsuario } = useAuth();
   const role = user?.role || null;
+  const cuentaRef = useRef<HTMLLIElement | null>(null);
+  const { usuario, setUsuario } = useAuth();
+
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -49,17 +50,23 @@ export default function AppNavbar() {
     }
   };
 
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (cuentaRef.current && !cuentaRef.current.contains(event.target)) {
-        setIsCuentaOpen(false);
-      }
+useEffect(() => {
+  function handleClickOutside(event: MouseEvent) {
+    if (
+      cuentaRef.current &&
+      event.target instanceof Node &&
+      !cuentaRef.current.contains(event.target)
+    ) {
+      setIsCuentaOpen(false);
     }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  }
+
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, []);
+
 
   const menuItems = [];
 
@@ -131,7 +138,8 @@ export default function AppNavbar() {
           </div>
 
           {/* Cuenta Desktop */}
-          <NavbarItem className="relative" ref={cuentaRef}>
+          <li ref={cuentaRef} className="relative">
+          <NavbarItem>
             <button
               onClick={() => setIsCuentaOpen(!isCuentaOpen)}
               className="text-sm px-4 py-1 rounded-full border border-white text-white bg-transparent hover:bg-white/10 transition flex items-center gap-2"
@@ -142,9 +150,7 @@ export default function AppNavbar() {
                 👤 {usuario?.nombre ?? "Cuenta"}
               </span>
               <svg
-                className={`w-4 h-4 ml-1 transition-transform ${
-                  isCuentaOpen ? "rotate-180" : "rotate-0"
-                }`}
+                className={`w-4 h-4 ml-1 transition-transform ${isCuentaOpen ? "rotate-180" : "rotate-0"}`}
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
@@ -153,16 +159,17 @@ export default function AppNavbar() {
                 <path d="M6 9l6 6 6-6" />
               </svg>
             </button>
+
             {isCuentaOpen && (
               <div
                 className="absolute right-0 mt-2 w-48 bg-[#0f172a] border border-white/20 rounded shadow-lg z-50"
                 onClick={(e) => e.stopPropagation()}
               >
                 <ul>
-                  {user && (
+                  {usuario && (
                     <>
                       <li className="px-4 py-2 text-sm text-blue-300 border-b border-white/10">
-                        {usuario.nombre}
+                        {usuario?.nombre}
                       </li>
                       <li>
                         <Link
@@ -183,7 +190,7 @@ export default function AppNavbar() {
                       </li>
                     </>
                   )}
-                  {!user && (
+                  {!usuario && (
                     <li>
                       <Link
                         to="/login"
@@ -198,6 +205,8 @@ export default function AppNavbar() {
               </div>
             )}
           </NavbarItem>
+        </li>
+
         </NavbarContent>
       </Navbar>
 
@@ -242,7 +251,7 @@ export default function AppNavbar() {
           <div className="border-t border-white/20 mt-2 pt-2">
             {user && (
               <div className="px-4 py-2 text-sm text-blue-300 font-medium border-b border-white/10">
-                👤 {usuario.nombre}
+                👤 {usuario?.nombre}
               </div>
             )}
             <button

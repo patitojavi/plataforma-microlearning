@@ -8,20 +8,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
-import { AnimatePresence, motion } from "framer-motion";
 import AppNavbar from "@/components/NavbarAdmin";
 import { obtenerCursos, crearCurso, eliminarCurso } from "@/services/cursos";
 
@@ -33,54 +21,27 @@ interface Course {
   createdAt: string;
 }
 
-interface Comment {
-  id: string;
-  user: string;
-  text: string;
-  date: string;
-}
-
 export default function ManageCoursesPage() {
   const [courses, setCourses] = useState<Course[]>([]);
-  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [dailyActivity, setDailyActivity] = useState<any[]>([]);
-  const [editForm, setEditForm] = useState({ instructor: "" });
-  const [createForm, setCreateForm] = useState({ titulo: "", descripcion: "", instructor: "" });
+  const [createForm, setCreateForm] = useState({
+    titulo: "",
+    descripcion: "",
+    instructor: "",
+  });
   const [showCreateForm, setShowCreateForm] = useState(false);
 
   useEffect(() => {
     fetchCourses();
-
-    setComments([
-      { id: "c1", user: "Usuario1", text: "Excelente curso", date: "2023-06-15" },
-      { id: "c2", user: "Usuario2", text: "Faltan ejemplos prácticos", date: "2023-06-18" }
-    ]);
-
-    setDailyActivity([
-      { hour: "9:00", visits: 5 },
-      { hour: "10:00", visits: 12 },
-      { hour: "11:00", visits: 8 },
-      { hour: "12:00", visits: 15 },
-      { hour: "13:00", visits: 3 },
-      { hour: "14:00", visits: 7 },
-      { hour: "15:00", visits: 10 },
-    ]);
   }, []);
 
   const fetchCourses = async () => {
     try {
       const token = localStorage.getItem("token") || "";
       const cursos = await obtenerCursos(token);
-      setCourses(cursos);
+      setCourses(cursos as unknown as Course[]);
     } catch (error) {
       console.error("Error al cargar capacitaciones:", error);
     }
-  };
-
-  const handleInspect = (course: Course) => {
-    setSelectedCourse(course);
-    setEditForm({ instructor: course.creador?.username || "" });
   };
 
   const handleCreateCourse = async () => {
@@ -91,9 +52,9 @@ export default function ManageCoursesPage() {
     try {
       const token = localStorage.getItem("token") || "";
       await crearCurso({
-        titulo: createForm.titulo,
-        descripcion: createForm.descripcion,
-        contenido: [],
+        name: createForm.titulo,
+        description: createForm.descripcion,
+        instructor: createForm.instructor,
       }, token);
       await fetchCourses();
       setShowCreateForm(false);
@@ -110,7 +71,6 @@ export default function ManageCoursesPage() {
       const token = localStorage.getItem("token") || "";
       await eliminarCurso(id, token);
       await fetchCourses();
-      setSelectedCourse(null);
       alert("Capacitación eliminada correctamente");
     } catch (error) {
       console.error("Error al eliminar capacitación:", error);
@@ -133,13 +93,13 @@ export default function ManageCoursesPage() {
               <Input
                 id="titulo"
                 value={createForm.titulo}
-                onChange={e => setCreateForm({ ...createForm, titulo: e.target.value })}
+                onChange={(e) => setCreateForm({ ...createForm, titulo: e.target.value })}
               />
               <Label htmlFor="descripcion">Descripción</Label>
               <Input
                 id="descripcion"
                 value={createForm.descripcion}
-                onChange={e => setCreateForm({ ...createForm, descripcion: e.target.value })}
+                onChange={(e) => setCreateForm({ ...createForm, descripcion: e.target.value })}
               />
               <div className="flex gap-2 mt-4">
                 <Button onClick={handleCreateCourse}>Guardar</Button>
@@ -160,15 +120,16 @@ export default function ManageCoursesPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {courses.map(course => (
+            {courses.map((course) => (
               <TableRow key={course._id}>
                 <TableCell>{course._id}</TableCell>
                 <TableCell>{course.titulo}</TableCell>
                 <TableCell>{course.descripcion}</TableCell>
-                <TableCell>{course.creador?.username || '-'}</TableCell>
-                <TableCell>
-                  <Button variant="outline" onClick={() => handleInspect(course)}>Inspeccionar</Button>
-                  <Button variant="destructive" onClick={() => handleDeleteCourse(course._id)}>Eliminar</Button>
+                <TableCell>{course.creador?.username || "-"}</TableCell>
+                <TableCell className="space-x-2">
+                  <Button variant="destructive" onClick={() => handleDeleteCourse(course._id)}>
+                    Eliminar
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
@@ -178,4 +139,3 @@ export default function ManageCoursesPage() {
     </div>
   );
 }
-  

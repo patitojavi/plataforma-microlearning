@@ -112,7 +112,7 @@ export default function AppNavbar() {
         </NavbarContent>
 
         {/* Menú principal para pantallas grandes */}
-        <NavbarContent className="hidden sm:flex flex-1 items-center" justify="between">
+        <NavbarContent className="hidden sm:flex flex-1 items-center justify-between" justify="start">
           <div className="flex gap-6 justify-center flex-1">
             {menuItems.map((item, index) => (
               <NavbarItem key={index}>
@@ -130,71 +130,74 @@ export default function AppNavbar() {
           </div>
 
           {/* Menú de cuenta (desktop) */}
-          <NavbarItem className="relative" ref={cuentaRef}>
-            <button
-              onClick={() => setIsCuentaOpen(!isCuentaOpen)}
-              className="text-sm px-4 py-1 rounded-full border border-white text-white bg-transparent hover:bg-white/10 transition flex items-center gap-1"
-              aria-haspopup="true"
-              aria-expanded={isCuentaOpen}
-            >
-              👤 {usuario?.nombre ?? "Cuenta"}
-              <svg
-                className={`w-4 h-4 ml-1 transition-transform ${isCuentaOpen ? "rotate-180" : "rotate-0"}`}
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
+          <li ref={cuentaRef} className="relative">
+            <NavbarItem>
+              <button
+                onClick={() => setIsCuentaOpen(!isCuentaOpen)}
+                className="text-sm px-4 py-1 rounded-full border border-white text-white bg-transparent hover:bg-white/10 transition flex items-center gap-1"
+                aria-haspopup="true"
+                aria-expanded={isCuentaOpen}
               >
-                <path d="M6 9l6 6 6-6" />
-              </svg>
-            </button>
+                👤 {usuario?.nombre ?? "Cuenta"}
+                <svg
+                  className={`w-4 h-4 ml-1 transition-transform ${isCuentaOpen ? "rotate-180" : "rotate-0"}`}
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </button>
 
-            {/* Dropdown del usuario */}
-            {isCuentaOpen && (
-              <div
-                className="absolute right-0 mt-2 w-40 bg-[#0f172a] border border-white/20 rounded shadow-lg z-50"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <ul>
-                  {usuario && (
-                    <>
-                      <li className="px-4 py-2 text-sm text-blue-300 border-b border-white/10">
-                        {usuario.nombre}
-                      </li>
-                      <li>
-                        <Link
-                          to="/perfil"
-                          onClick={() => setIsCuentaOpen(false)}
-                          className="block px-4 py-2 text-white hover:bg-white/10"
-                        >
-                          Perfil
-                        </Link>
-                      </li>
-                    </>
-                  )}
-                  <li>
-                    <Link
-                      to="/login"
-                      onClick={() => setIsCuentaOpen(false)}
-                      className="block px-4 py-2 text-white hover:bg-white/10"
-                    >
-                      Login
-                    </Link>
-                  </li>
-                  {usuario && (
+              {/* Dropdown del usuario */}
+              {isCuentaOpen && (
+                <div
+                  className="absolute right-0 mt-2 w-40 bg-[#0f172a] border border-white/20 rounded shadow-lg z-50"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <ul>
+                    {usuario && (
+                      <>
+                        <li className="px-4 py-2 text-sm text-blue-300 border-b border-white/10">
+                          {usuario.nombre}
+                        </li>
+                        <li>
+                          <Link
+                            to="/perfil"
+                            onClick={() => setIsCuentaOpen(false)}
+                            className="block px-4 py-2 text-white hover:bg-white/10"
+                          >
+                            Perfil
+                          </Link>
+                        </li>
+                      </>
+                    )}
                     <li>
-                      <button
-                        onClick={handleLogout}
-                        className="w-full text-left px-4 py-2 text-white hover:bg-white/10"
+                      <Link
+                        to="/login"
+                        onClick={() => setIsCuentaOpen(false)}
+                        className="block px-4 py-2 text-white hover:bg-white/10"
                       >
-                        Cerrar sesión
-                      </button>
+                        Login
+                      </Link>
                     </li>
-                  )}
-                </ul>
-              </div>
-            )}
-          </NavbarItem>
+                    {usuario && (
+                      <li>
+                        <button
+                          onClick={handleLogout}
+                          className="w-full text-left px-4 py-2 text-white hover:bg-white/10"
+                        >
+                          Cerrar sesión
+                        </button>
+                      </li>
+                    )}
+                  </ul>
+                </div>
+              )}
+            </NavbarItem>
+          </li>
+
         </NavbarContent>
       </Navbar>
 

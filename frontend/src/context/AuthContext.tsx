@@ -3,8 +3,9 @@ import {
   useContext,
   useState,
   useEffect,
-  ReactNode,
 } from "react";
+
+import type { ReactNode } from "react";
 
 // Tipo de usuario
 interface Usuario {
