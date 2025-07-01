@@ -27,12 +27,7 @@ router.get('/capacitador', verifyToken, verifyRole(['capacitador']), (req, res) 
 // Obtener un usuario por ID
 router.get('/:id', verifyToken, verifyRole(['admin']), obtenerUsuario);
 
-// Ruta accesible por admin o capacitador
-router.get('/privado', verifyToken, verifyRole(['admin', 'capacitador']), (req, res) => {
-  const rol = req.user?.role;
-  console.log(`✅ Acceso correcto como ${rol?.toUpperCase()}`);
-  res.json({ message: `Hola ${rol}, puedes ver esta ruta privada` });
-});
+
 // Actualizar un usuario
 router.put('/:id', verifyToken, verifyRole(['admin']), actualizarUsuario);
 

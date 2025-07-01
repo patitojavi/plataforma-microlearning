@@ -3,30 +3,34 @@ import { Evaluacion } from '../models/evaluacion.model';
 import { User } from '../models/user.model';
 import { AuthRequest } from '../middlewares/auth.middleware';
 
-export const crearEvaluacion = async (req: AuthRequest, res: Response) => {
+export const crearEvaluacion = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { capacitacionId, preguntas } = req.body;
     const evaluacion = new Evaluacion({ capacitacion: capacitacionId, preguntas });
     await evaluacion.save();
-    return res.status(201).json(evaluacion);
+    res.status(201).json(evaluacion);
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: 'Error al crear evaluación' });
+    console.error('Error al crear evaluación:', err);
+    res.status(500).json({ message: 'Error al crear evaluación' });
   }
 };
 
-export const responderEvaluacion = async (req: AuthRequest, res: Response) => {
+
+
+export const responderEvaluacion = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { evaluacionId, respuestas } = req.body;
     const userId = req.user?.id;
 
     if (!userId) {
-      return res.status(401).json({ message: 'Usuario no autenticado' });
+      res.status(401).json({ message: 'Usuario no autenticado' });
+      return;
     }
 
     const evaluacion = await Evaluacion.findById(evaluacionId);
     if (!evaluacion) {
-      return res.status(404).json({ message: 'Evaluación no encontrada' });
+      res.status(404).json({ message: 'Evaluación no encontrada' });
+      return;
     }
 
     let puntaje = 0;
@@ -36,10 +40,10 @@ export const responderEvaluacion = async (req: AuthRequest, res: Response) => {
 
     const porcentaje = (puntaje / evaluacion.preguntas.length) * 100;
 
-    // Buscar usuario y asignar insignia
     const usuario = await User.findById(userId);
     if (!usuario) {
-      return res.status(404).json({ message: 'Usuario no encontrado' });
+      res.status(404).json({ message: 'Usuario no encontrado' });
+      return;
     }
 
     let nuevaInsignia = '';
@@ -52,19 +56,18 @@ export const responderEvaluacion = async (req: AuthRequest, res: Response) => {
       nuevaInsignia = 'Insignia de Participación';
     }
 
-    // Evitar duplicados
     if (!usuario.badges.includes(nuevaInsignia)) {
       usuario.badges.push(nuevaInsignia);
       await usuario.save();
     }
 
-    return res.json({
+    res.json({
       puntaje,
       porcentaje,
       insignia: nuevaInsignia
     });
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: 'Error al responder evaluación' });
+    console.error('Error al responder evaluación:', err);
+    res.status(500).json({ message: 'Error al responder evaluación' });
   }
 };
