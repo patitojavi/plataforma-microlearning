@@ -23,7 +23,7 @@ import {
 } from "recharts";
 import { AnimatePresence, motion } from "framer-motion";
 import AppNavbar from "@/components/NavbarAdmin";
-import { obtenerCursos, crearCurso, eliminarCurso, type Course } from "@/services/cursos";
+import { obtenerCursos, crearCurso, eliminarCurso, type Capacitaciones } from "@/services/cursos";
 import { toast } from "sonner";
 import { getUsuarios } from "@/services/usuarios";
 
@@ -67,8 +67,8 @@ const modalVariants = {
 };
 
 export default function ManageCoursesPage() {
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+  const [courses, setCourses] = useState<Capacitaciones[]>([]);
+  const [selectedCourse, setSelectedCourse] = useState<Capacitaciones | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [dailyActivity, setDailyActivity] = useState<DailyActivity[]>([]);
   const [editForm, setEditForm] = useState({ capacitador: "" });
@@ -124,7 +124,7 @@ export default function ManageCoursesPage() {
     }
   };
 
-  const handleInspect = (course: Course) => {
+  const handleInspect = (course: Capacitaciones) => {
     setSelectedCourse(course);
     setEditForm({ capacitador: course.creador?.username || "" });
   };
@@ -416,16 +416,15 @@ export default function ManageCoursesPage() {
                       <CardContent>
                         <div className="space-y-4">
                           <div>
-                            <Label htmlFor="role">Rol</Label>
+                            <Label htmlFor="capacitador">Seleccione Capacitador</Label>
                             <select
-                              id="role"
+                              id="capacitador"
                               value={editForm.capacitador}
                               onChange={(e) =>
                                 setEditForm({ ...editForm, capacitador: e.target.value })
                               }
                               className="w-full p-2 border rounded"
                             >
-                              <option value="">Seleccionar Capacitador</option>
                               {users
                                 .map((user) => (
                                   <option key={user._id} value={user.username}>

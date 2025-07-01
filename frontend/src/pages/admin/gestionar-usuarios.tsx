@@ -136,12 +136,7 @@ export default function ManageUsersPage() {
     };
 
     return (
-        <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className="bg-gray-100 min-h-screen"
-        >
+        <div className="min-h-screen bg-gray-100">
             <AppNavbar />
             <div className="container mx-auto p-4 relative">
                 <motion.div
@@ -341,6 +336,6 @@ export default function ManageUsersPage() {
                     )}
                 </AnimatePresence>
             </div>
-        </motion.div>
+        </div>
     );
 }
