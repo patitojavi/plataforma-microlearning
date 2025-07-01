@@ -18,10 +18,22 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+
+
+
+app.get('/', (_req, res) => {
+  res.send('🎉 Plataforma Microlearning Backend en línea');
+});
+
+
+
+
 app.use('/api/auth', authRoutes);
 app.use('/api/usuarios', userRoutes);
 app.use('/api/capacitaciones', capacitacionRoutes);
 app.use('/api/evaluaciones', evaluacionRoutes);
+
+
 
 connectDB().then(() => {
   app.listen(PORT, () => {
