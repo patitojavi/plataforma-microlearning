@@ -35,8 +35,12 @@ app.use('/api/evaluaciones', evaluacionRoutes);
 
 
 
-connectDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+connectDB()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`✅ Server running on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error('❌ Error al conectar con la base de datos:', err);
   });
-});
