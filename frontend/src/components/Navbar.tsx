@@ -69,10 +69,10 @@ export default function AppNavbar() {
     };
   }, []);
 
-  // Enlaces principales de navegación
+  // Enlaces principales de navegación (modificado para incluir "Mis capacitaciones")
   const menuItems = [
     { name: "Capacitaciones", path: "/capacitaciones" },
-    { name: "Responder Evaluación", path: "/responder" },
+    { name: "Mis capacitaciones", path: "/mis-capacitaciones" },  
     { name: "Historial de Cursos", path: "/historial" },
   ];
 
