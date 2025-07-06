@@ -12,6 +12,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import AppNavbar from "@/components/NavbarAdmin";
 import { obtenerCursos, crearCurso, eliminarCurso, type Capacitaciones } from "@/services/cursos";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AnimatePresence, motion } from "framer-motion";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { toast } from "sonner";
 import { getUsuarios } from "@/services/usuarios";
 
