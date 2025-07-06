@@ -8,20 +8,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
-import { AnimatePresence, motion } from "framer-motion";
 import AppNavbar from "@/components/NavbarAdmin";
 import { obtenerCursos, crearCurso, eliminarCurso, type Capacitaciones } from "@/services/cursos";
 import { toast } from "sonner";

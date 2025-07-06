@@ -2,83 +2,107 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Navbar from '@/components/Navbar';
 
-interface Curso {
+// Interface que describe la estructura de una capacitación
+interface Capacitacion {
   _id: string;
   titulo: string;
   descripcion: string;
+  creador: { username: string };
+  contenido: string; // URL del video
+  videoUrl?: string; // Video asociado
+  miembros?: string[]; // Lista de miembros
+  yaInscrito: boolean; // Indica si el usuario ya está inscrito en la capacitación
 }
 
-interface CursoCompletado extends Curso {
-  progreso: number;
-}
+export default function MisCapacitaciones() {
+  const [misCapacitaciones, setMisCapacitaciones] = useState<Capacitacion[]>([]); 
 
-export default function HistorialCursos() {
-  const [cursos, setCursos] = useState<CursoCompletado[]>([]);
-
+  // Obtener las "Mis capacitaciones" desde la API
   useEffect(() => {
-    const fetchCursosCompletados = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) return alert('Debes iniciar sesión');
-
+    const fetchCapacitaciones = async () => {
       try {
-        // Obtener todas las capacitaciones
-        const res = await axios.get('http://localhost:5000/api/capacitaciones', {
-          headers: { Authorization: `Bearer ${token}` }
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        const res = await axios.get('https://plataforma-microlearning-x4bz.onrender.com/api/mis-capacitaciones', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         });
 
-        const todas: Curso[] = res.data;
+        // Mostrar los datos obtenidos para depurar
+        console.log("Datos recibidos del backend:", res.data);
 
-        // Para cada curso, obtener su progreso
-        const completados: CursoCompletado[] = [];
+        // Filtramos las capacitaciones donde el usuario está inscrito (yaInscrito = true)
+        const capacitacionesInscritas = res.data.filter((cap: Capacitacion) => cap.yaInscrito);
+        console.log("Capacitaciones en las que el usuario está inscrito:", capacitacionesInscritas); // Verifica las capacitaciones filtradas
 
-        for (const curso of todas) {
-          try {
-            const progresoRes = await axios.get(
-              `http://localhost:5000/api/capacitaciones/${curso._id}/progreso`,
-              {
-                headers: { Authorization: `Bearer ${token}` }
-              }
-            );
+        setMisCapacitaciones(capacitacionesInscritas);
 
-            const progreso = progresoRes.data.progreso;
-
-            if (progreso === 100) {
-              completados.push({ ...curso, progreso });
-            }
-          } catch (err: any) {
-            // ignorar errores individuales de progreso
-            console.warn(`Error al obtener progreso de ${curso.titulo}`);
-          }
-        }
-
-        setCursos(completados);
-      } catch (err: any) {
-        alert(err.response?.data?.message || 'Error al obtener historial');
+      } catch (err) {
+        console.error('Error al obtener las capacitaciones', err);
       }
     };
 
-    fetchCursosCompletados();
+    fetchCapacitaciones();
   }, []);
+
+  // Manejar la visualización del progreso del curso
+  const handleVerProgreso = async (id: string) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('Debes iniciar sesión para ver el progreso');
+      return;
+    }
+
+    try {
+      const res = await axios.get(
+        `https://plataforma-microlearning-x4bz.onrender.com/api/capacitaciones/${id}/progreso`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert(`Tu progreso en esta capacitación es: ${res.data.progreso}%`);
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Error al obtener el progreso');
+    }
+  };
 
   return (
     <div className="bg-gray-100 min-h-screen pb-10">
       <Navbar />
+      
+      {/* Sección de "Mis capacitaciones" */}
       <h2 className="text-3xl font-bold text-center text-gray-800 mt-10 mb-8">
-        🏆 Historial de Cursos Completados
+        📚 Mis capacitaciones
       </h2>
 
       <div className="flex flex-wrap justify-center gap-6 px-4">
-        {cursos.length === 0 ? (
-          <p className="text-gray-500 text-center">No has completado ninguna capacitación aún.</p>
+        {misCapacitaciones.length === 0 ? (
+          <p className="text-gray-500 text-center">No tienes capacitaciones disponibles.</p>
         ) : (
-          cursos.map(curso => (
+          misCapacitaciones.map((cap) => (
             <div
-              key={curso._id}
-              className="bg-white rounded-2xl shadow-md w-full max-w-sm p-6 transition hover:shadow-lg"
+              key={cap._id}
+              className="bg-white rounded-2xl shadow-md w-full max-w-sm p-6 flex flex-col justify-between transition hover:shadow-lg"
             >
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">{curso.titulo}</h3>
-              <p className="text-gray-600 text-sm">{curso.descripcion}</p>
-              <p className="mt-4 text-green-600 font-bold text-sm">✅ Completado al 100%</p>
+              <div>
+                <h3 className="text-xl font-semibold text-gray-800 mb-2 cursor-pointer">
+                  {cap.titulo}
+                </h3>
+                <p className="text-gray-600 text-sm">{cap.descripcion}</p>
+              </div>
+
+              <p className="text-sm text-gray-500 mt-4">
+                <strong>👤 Creado por:</strong> {cap.creador?.username || 'Desconocido'}
+              </p>
+
+              <div className="flex justify-between mt-6">
+                <button
+                  onClick={() => handleVerProgreso(cap._id)}
+                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+                >
+                  Ver progreso
+                </button>
+              </div>
             </div>
           ))
         )}

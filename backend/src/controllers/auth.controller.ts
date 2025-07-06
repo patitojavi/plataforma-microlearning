@@ -2,6 +2,8 @@
     import { User } from '../models/user.model';
     import { generateToken } from '../services/jwt.service';
 
+
+/// Registrar un nuevo usuario
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, username, rut, password } = req.body;
@@ -30,6 +32,10 @@ export const register = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+
+
+
+// Iniciar sesión y obtener token
 export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password } = req.body;
