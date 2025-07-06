@@ -2,7 +2,7 @@ import axios from "axios";
 import { type UserData } from "./auth";
 
 
-const API_URL = "http://localhost:5000/api/usuarios";
+const API_URL = "http://plataforma-microlearning-x4bz.onrender.com/api/usuarios";
 
 export const getUsuarios = async (token: string): Promise<UserData[]> => {
     try {
