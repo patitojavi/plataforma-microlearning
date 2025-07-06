@@ -61,14 +61,10 @@ export default function CapacitadorCursos() {
 
         try {
             const token = localStorage.getItem("token") || "";
-
-            // Crear el string del contenido combinando los campos
             const contenidoStr = `${newContent.titulo}|${newContent.descripcion}|${newContent.contenido}`;
-
             let updatedContenido = [...selectedCapacitacion.contenido];
 
             if (editingContent) {
-                // Encontrar y reemplazar el contenido existente
                 const index = updatedContenido.findIndex(item =>
                     item.includes(editingContent.titulo)
                 );
@@ -76,7 +72,6 @@ export default function CapacitadorCursos() {
                     updatedContenido[index] = contenidoStr;
                 }
             } else {
-                // Agregar nuevo contenido
                 updatedContenido.push(contenidoStr);
             }
 
@@ -90,7 +85,6 @@ export default function CapacitadorCursos() {
             setShowContentForm(false);
             setEditingContent(null);
 
-            // Actualizar la lista de capacitaciones
             const updatedCapacitaciones = capacitaciones.map(cap =>
                 cap._id === selectedCapacitacion._id ? updatedCapacitacion : cap
             );
@@ -118,7 +112,6 @@ export default function CapacitadorCursos() {
             await actualizarCurso(selectedCapacitacion._id, updatedCapacitacion, token);
             setSelectedCapacitacion(updatedCapacitacion);
 
-            // Actualizar la lista de capacitaciones
             const updatedCapacitaciones = capacitaciones.map(cap =>
                 cap._id === selectedCapacitacion._id ? updatedCapacitacion : cap
             );
