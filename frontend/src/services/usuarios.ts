@@ -2,7 +2,7 @@ import axios from "axios";
 import { type UserData } from "./auth";
 
 
-const API_URL = "http://localhost:5000/api/usuarios";
+const API_URL = "https://plataforma-microlearning-x4bz.onrender.com/api/usuarios";
 
 export const getUsuarios = async (token: string): Promise<UserData[]> => {
     try {
@@ -19,10 +19,8 @@ export const getUsuarios = async (token: string): Promise<UserData[]> => {
     }
 };
 
-export const updateUsuario = async (usuarioId: string, usuarioData: UserData) => {
+export const updateUsuario = async (usuarioId: string, usuarioData: UserData, token: string) => {
     try {
-        const token = localStorage.getItem("token");
-        usuarioId = token.id;
         const response = await axios.put(`${API_URL}/${usuarioId}`, usuarioData, {
             headers: { Authorization: `Bearer ${token}` }
         });
@@ -33,10 +31,8 @@ export const updateUsuario = async (usuarioId: string, usuarioData: UserData) =>
     }
 };
 
-export const deleteUsuario = async (usuarioId: string) => {
+export const deleteUsuario = async (usuarioId: string, token: string) => {
     try {
-        const token = localStorage.getItem("token");
-        usuarioId = token.id;
         const response = await axios.delete(`${API_URL}/${usuarioId}`, {
             headers: { Authorization: `Bearer ${token}` }
         });

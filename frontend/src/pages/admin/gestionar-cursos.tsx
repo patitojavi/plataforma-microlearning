@@ -11,11 +11,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import AppNavbar from "@/components/NavbarAdmin";
+import { obtenerCursos, crearCurso, eliminarCurso, type Capacitaciones } from "@/services/cursos";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AnimatePresence, motion } from "framer-motion";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { obtenerCursos, crearCurso, eliminarCurso, type Course } from "@/services/cursos";
 import { toast } from "sonner";
+import { getUsuarios } from "@/services/usuarios";
 
 interface Comment {
   id: string;
@@ -57,36 +58,71 @@ const modalVariants = {
 };
 
 export default function ManageCoursesPage() {
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+  const [courses, setCourses] = useState<Capacitaciones[]>([]);
+  const [selectedCourse, setSelectedCourse] = useState<Capacitaciones | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [dailyActivity, setDailyActivity] = useState<DailyActivity[]>([]);
-  const [editForm, setEditForm] = useState({ creador: "" });
+  const [editForm, setEditForm] = useState({ capacitador: "" });
   const [createForm, setCreateForm] = useState({ titulo: "", descripcion: "", creador: "" });
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [users, setUsers] = useState<{ _id: string; username: string; role: string }[]>([]);
 
   useEffect(() => {
     fetchCourses();
+    fetchUsers();
+    setComments([
+      { id: "c1", user: "Usuario1", text: "Excelente curso", date: "2023-06-15" },
+      { id: "c2", user: "Usuario2", text: "Faltan ejemplos prácticos", date: "2023-06-18" }
+    ]);
+
+    setDailyActivity([
+      { hour: "9:00", visits: 5 },
+      { hour: "10:00", visits: 12 },
+      { hour: "11:00", visits: 8 },
+      { hour: "12:00", visits: 15 },
+      { hour: "13:00", visits: 3 },
+      { hour: "14:00", visits: 7 },
+      { hour: "15:00", visits: 10 },
+    ]);
   }, []);
 
   const fetchCourses = async () => {
     try {
       const token = localStorage.getItem("token") || "";
       const cursos = await obtenerCursos(token);
-      setCourses(cursos as unknown as Course[]);
+      // const comentarios = cursos.flatMap(course =>
+      //   course.comentarios.map(comment => ({
+      //     id: comment._id,
+      //     user: comment.usuario?.username || "Anónimo",
+      //     text: comment.texto,
+      //     date: new Date(comment.fecha).toLocaleDateString(),
+      //   })) || []
+      // );
+      setCourses(cursos);
     } catch (error) {
       console.error("Error al cargar capacitaciones:", error);
     }
   };
 
-  const handleInspect = (course: Course) => {
+  const fetchUsers = async () => {
+    try {
+      const token = localStorage.getItem("token") || "";
+      const users = await getUsuarios(token);
+      const filteredUsers = users.filter(user => user.role === "capacitador");
+      setUsers(filteredUsers);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  };
+
+  const handleInspect = (course: Capacitaciones) => {
     setSelectedCourse(course);
-    setEditForm({ creador: course.creador?.username || "" });
+    setEditForm({ capacitador: course.creador?.username || "" });
   };
 
   const handleCloseInspection = () => {
     setSelectedCourse(null);
-    setEditForm({ creador: "" });
+    setEditForm({ capacitador: "" });
   };
 
   const handleCreateCourse = async () => {
@@ -106,14 +142,14 @@ export default function ManageCoursesPage() {
       setShowCreateForm(false);
       setCreateForm({ titulo: "", descripcion: "", creador: "" });
       toast.success("Capacitación creada correctamente", {
-          position: "top-center",
-          duration: 3000,
+        position: "top-center",
+        duration: 3000,
       });
     } catch (error) {
       console.error("Error al crear capacitación:", error);
       toast.error("Error al crear capacitación", {
-          position: "top-center",
-          duration: 3000,
+        position: "top-center",
+        duration: 3000,
       });
     }
   };
@@ -125,14 +161,14 @@ export default function ManageCoursesPage() {
       await fetchCourses();
       setSelectedCourse(null);
       toast.success("Capacitación eliminada correctamente", {
-          position: "top-center",
-          duration: 3000,
+        position: "top-center",
+        duration: 3000,
       });
     } catch (error) {
       console.error("Error al eliminar capacitación:", error);
       toast.error("Error al eliminar capacitación", {
-          position: "top-center",
-          duration: 3000,
+        position: "top-center",
+        duration: 3000,
       });
     }
   };
@@ -371,15 +407,22 @@ export default function ManageCoursesPage() {
                       <CardContent>
                         <div className="space-y-4">
                           <div>
-                            <Label htmlFor="instructor">Capacitador</Label>
-                            <Input
-                              id="instructor"
-                              value={editForm.creador}
+                            <Label htmlFor="capacitador">Seleccione Capacitador</Label>
+                            <select
+                              id="capacitador"
+                              value={editForm.capacitador}
                               onChange={(e) =>
-                                setEditForm({ ...editForm, creador: e.target.value })
+                                setEditForm({ ...editForm, capacitador: e.target.value })
                               }
-                              placeholder="Nombre del capacitador"
-                            />
+                              className="w-full p-2 border rounded"
+                            >
+                              {users
+                                .map((user) => (
+                                  <option key={user._id} value={user.username}>
+                                    {user.username}
+                                  </option>
+                                ))}
+                            </select>
                           </div>
                           <div className="flex justify-between pt-4">
                             <Button onClick={() => handleCloseInspection()}>

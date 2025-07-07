@@ -38,7 +38,7 @@ export default function Login() {
           navigate("/admin");
           break;
         case "capacitador":
-          navigate("/capacitaciones");
+          navigate("/capacitador");
           break;
         case "usuario":
           navigate("/usuario");

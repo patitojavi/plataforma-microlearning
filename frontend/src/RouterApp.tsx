@@ -4,6 +4,7 @@ import App from './App';
 import Login from './pages/Login/Login';
 import Register from './pages/Register/Register';
 import Capacitaciones from './pages/usuario/Capacitaciones';
+import MisCapacitaciones from './pages/usuario/Mis-Capacitaciones'; // Asegúrate de crear este componente
 import ResponderEvaluacion from './pages/usuario/ResponderEvaluacion';
 import HistorialCursos from './pages/usuario/historial';
 import Perfil from './pages/Perfil/Perfil';
@@ -35,6 +36,11 @@ export default function RouterApp() {
           <Capacitaciones />
         </PrivateRoute>
       } />
+      <Route path="/mis-capacitaciones" element={
+        <PrivateRoute allowedRoles={["usuario"]}>
+          <MisCapacitaciones />
+        </PrivateRoute>
+      } />
       <Route path="/responder" element={
         <PrivateRoute allowedRoles={["usuario"]}>
           <ResponderEvaluacion />
@@ -45,6 +51,7 @@ export default function RouterApp() {
           <HistorialCursos />
         </PrivateRoute>
       } />
+
       {/* Rutas protegidas - admin */}
       <Route path="/admin" element={
         <PrivateRoute allowedRoles={["admin"]}>
@@ -56,7 +63,7 @@ export default function RouterApp() {
           <ManageUsersPage />
         </PrivateRoute>
       } />
-      <Route path="/admin/gestionar-cursos" element={
+      <Route path="/admin/gestionar-capacitaciones" element={
         <PrivateRoute allowedRoles={["admin"]}>
           <ManageCoursesPage />
         </PrivateRoute>
@@ -68,7 +75,7 @@ export default function RouterApp() {
           <CapacitadorPage />
         </PrivateRoute>
       } />
-      <Route path="/capacitador/cursos" element={
+      <Route path="/capacitador/capacitaciones" element={
         <PrivateRoute allowedRoles={["capacitador"]}>
           <CapacitadorCursos />
         </PrivateRoute>

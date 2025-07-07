@@ -43,7 +43,7 @@ export const getCurrentUser = (): UserData | null => {
   try {
     const payload = JSON.parse(atob(token.split('.')[1]));
     return {
-      _id: payload.id, 
+      _id: payload.id,
       email: payload.email,
       username: payload.username,
       rut: payload.rut,
