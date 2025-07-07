@@ -3,16 +3,19 @@ import {
   useContext,
   useState,
   useEffect,
-  ReactNode,
 } from "react";
+
+import type { ReactNode } from "react";
 
 // Tipo de usuario
 interface Usuario {
+  _id: string;
   nombre: string;
   email: string;
   rut: string;
   role: string;
 }
+
 
 // Tipo del contexto
 interface AuthContextType {

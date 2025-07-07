@@ -23,6 +23,7 @@ import {
 } from "recharts";
 import { AnimatePresence, motion } from "framer-motion";
 import AppNavbar from "@/components/NavbarAdmin";
+import { getUsuarios, deleteUsuario, updateUsuario } from "@/services/usuarios";
 
 interface User {
     id: string;
@@ -30,8 +31,8 @@ interface User {
     username: string;
     rut: string;
     role: string;
-    createdAt: string;
-    lastLogin: string;
+    // createdAt: string;
+    // lastLogin: string;
 }
 
 interface Course {
@@ -41,11 +42,15 @@ interface Course {
     progress: number;
 }
 
+interface DailyActivity {
+    name: string;
+    logins: number;
+}
 export default function ManageUsersPage() {
     const [users, setUsers] = useState<User[]>([]);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [userCourses, setUserCourses] = useState<Course[]>([]);
-    const [activityData, setActivityData] = useState<any[]>([]);
+    const [activityData, setActivityData] = useState<DailyActivity[]>([]);
     const [editForm, setEditForm] = useState({
         email: "",
         username: "",
@@ -54,28 +59,7 @@ export default function ManageUsersPage() {
     });
 
     useEffect(() => {
-        const mockUsers: User[] = [
-            {
-                id: "1",
-                email: "usuario1@ejemplo.com",
-                username: "Usuario Uno",
-                rut: "12345678-9",
-                role: "admin",
-                createdAt: "2023-01-15",
-                lastLogin: "2023-06-20",
-            },
-            {
-                id: "2",
-                email: "usuario2@ejemplo.com",
-                username: "Usuario Dos",
-                rut: "98765432-1",
-                role: "usuario",
-                createdAt: "2023-02-10",
-                lastLogin: "2023-06-18",
-            },
-        ];
-        setUsers(mockUsers);
-
+        fetchUsers();
         const mockCourses: Course[] = [
             {
                 id: "c1",
@@ -103,6 +87,16 @@ export default function ManageUsersPage() {
         setActivityData(mockActivity);
     }, []);
 
+    const fetchUsers = async () => {
+        try {
+            const token = localStorage.getItem("token") || ""; // Replace with actual token
+            const usuarios = await getUsuarios(token);
+            setUsers(usuarios);
+        } catch (error) {
+            console.error("Error fetching users:", error);
+        }
+    };
+
     const handleInspect = (user: User) => {
         setSelectedUser(user);
         setEditForm({
@@ -113,14 +107,40 @@ export default function ManageUsersPage() {
         });
     };
 
-    const handleUpdateUser = () => {
-        alert("Usuario actualizado correctamente");
-        setSelectedUser(null);
+    const handleDeleteUser = async (userId: string) => {
+        try {
+            const token = localStorage.getItem("token") || "";
+            await deleteUsuario(userId, token);
+            setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
+            setSelectedUser(null);
+            alert("Usuario eliminado correctamente");
+        } catch (error) {
+            console.error("Error deleting user:", error);
+        }
     };
 
-    const handleDeleteUser = (userId: string) => {
-        alert(`Usuario ${userId} eliminado`);
-        setSelectedUser(null);
+    const handleUpdateUser = async () => {
+        if (!selectedUser) return;
+        try {
+            const token = localStorage.getItem("token") || "";
+            const updatedUser = {
+                ...selectedUser,
+                email: editForm.email,
+                username: editForm.username,
+                rut: editForm.rut,
+                role: editForm.role,
+            };
+            await updateUsuario(selectedUser.id, updatedUser, token);
+            setUsers((prevUsers) =>
+                prevUsers.map((user) =>
+                    user.id === selectedUser.id ? updatedUser : user
+                )
+            );
+            setSelectedUser(updatedUser);
+            alert("Usuario actualizado correctamente");
+        } catch (error) {
+            console.error("Error updating user:", error);
+        }
     };
 
     const handleCloseInspection = () => {
@@ -142,7 +162,7 @@ export default function ManageUsersPage() {
                     transition={{ delay: 0.2, duration: 0.5 }}
                 >
                     <h1 className="text-2xl font-bold mb-6">Gestión de Usuarios</h1>
-                    
+
                     {/* Tabla de usuarios */}
                     <div className="border rounded-lg overflow-hidden">
                         <Table>
@@ -152,8 +172,8 @@ export default function ManageUsersPage() {
                                     <TableHead>Email</TableHead>
                                     <TableHead>RUT</TableHead>
                                     <TableHead>Rol</TableHead>
-                                    <TableHead>Fecha Creación</TableHead>
-                                    <TableHead>Último Login</TableHead>
+                                    {/* <TableHead>Fecha Creación</TableHead>
+                                    <TableHead>Último Login</TableHead> */}
                                     <TableHead>Acciones</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -164,8 +184,8 @@ export default function ManageUsersPage() {
                                         <TableCell>{user.email}</TableCell>
                                         <TableCell>{user.rut}</TableCell>
                                         <TableCell>{user.role}</TableCell>
-                                        <TableCell>{user.createdAt}</TableCell>
-                                        <TableCell>{user.lastLogin}</TableCell>
+                                        {/* <TableCell>{user.createdAt}</TableCell>
+                                        <TableCell>{user.lastLogin}</TableCell> */}
                                         <TableCell>
                                             <Button
                                                 variant="outline"
@@ -192,7 +212,7 @@ export default function ManageUsersPage() {
                                 exit={{ opacity: 0 }}
                                 className="fixed inset-0 bg-black z-40"
                                 onClick={handleCloseInspection}
-                                style={{ marginTop: '64px' }} 
+                                style={{ marginTop: '64px' }}
                             />
 
                             {/* Panel de inspección */}
@@ -217,7 +237,7 @@ export default function ManageUsersPage() {
                                             </svg>
                                         </button>
                                     </div>
-                                    
+
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
                                         {/* Card 1: Actividad del usuario */}
                                         <Card className="border rounded-lg overflow-hidden">
@@ -264,16 +284,6 @@ export default function ManageUsersPage() {
                                                             value={editForm.username}
                                                             onChange={(e) =>
                                                                 setEditForm({ ...editForm, username: e.target.value })
-                                                            }
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <Label htmlFor="rut">RUT</Label>
-                                                        <Input
-                                                            id="rut"
-                                                            value={editForm.rut}
-                                                            onChange={(e) =>
-                                                                setEditForm({ ...editForm, rut: e.target.value })
                                                             }
                                                         />
                                                     </div>
