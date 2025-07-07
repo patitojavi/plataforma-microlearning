@@ -9,7 +9,7 @@ export interface Course {
   createdAt: string;
 }
 
-const API_URL = "http://localhost:5000/api/capacitaciones";
+const API_URL = "https://plataforma-microlearning-x4bz.onrender.com/api/capacitaciones";
 
 export const crearCurso = async (data: {
   titulo: string; 

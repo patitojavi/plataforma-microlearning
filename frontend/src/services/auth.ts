@@ -1,11 +1,11 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/auth';
+const API_URL = 'https://plataforma-microlearning-x4bz.onrender.com/api/auth';
 
 interface AuthResponse {
   token: string;
   user: {
-    id: string;
+    _id: string;
     email: string;
     username: string;
     rut: string;
@@ -14,7 +14,7 @@ interface AuthResponse {
 }
 
 export interface UserData {
-  id: string;
+  _id: string;
   email: string;
   username: string;
   rut: string;
@@ -39,11 +39,11 @@ export const login = async (data: { email: string; password: string }): Promise<
 export const getCurrentUser = (): UserData | null => {
   const token = localStorage.getItem('token');
   if (!token) return null;
-  
+
   try {
     const payload = JSON.parse(atob(token.split('.')[1]));
     return {
-      id: payload.id,
+      _id: payload.id, 
       email: payload.email,
       username: payload.username,
       rut: payload.rut,

@@ -8,21 +8,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
-import { AnimatePresence, motion } from "framer-motion";
 import AppNavbar from "@/components/NavbarAdmin";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AnimatePresence, motion } from "framer-motion";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { obtenerCursos, crearCurso, eliminarCurso, type Course } from "@/services/cursos";
 import { toast } from "sonner";
 
@@ -76,28 +67,13 @@ export default function ManageCoursesPage() {
 
   useEffect(() => {
     fetchCourses();
-
-    setComments([
-      { id: "c1", user: "Usuario1", text: "Excelente curso", date: "2023-06-15" },
-      { id: "c2", user: "Usuario2", text: "Faltan ejemplos prácticos", date: "2023-06-18" }
-    ]);
-
-    setDailyActivity([
-      { hour: "9:00", visits: 5 },
-      { hour: "10:00", visits: 12 },
-      { hour: "11:00", visits: 8 },
-      { hour: "12:00", visits: 15 },
-      { hour: "13:00", visits: 3 },
-      { hour: "14:00", visits: 7 },
-      { hour: "15:00", visits: 10 },
-    ]);
   }, []);
 
   const fetchCourses = async () => {
     try {
       const token = localStorage.getItem("token") || "";
       const cursos = await obtenerCursos(token);
-      setCourses(cursos);
+      setCourses(cursos as unknown as Course[]);
     } catch (error) {
       console.error("Error al cargar capacitaciones:", error);
     }
