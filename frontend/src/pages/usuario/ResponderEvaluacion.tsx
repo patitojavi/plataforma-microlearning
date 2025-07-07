@@ -3,20 +3,17 @@ import { responderEvaluacion } from '@/services/evaluacion';
 import Navbar from '@/components/Navbar';
 
 export default function ResponderEvaluacion() {
-  // Estado para el ID de la evaluación y las respuestas del usuario
   const [evaluacionId, setEvaluacionId] = useState('');
-  const [respuestas, setRespuestas] = useState<string[]>(['', '']); // Dos preguntas como ejemplo
+  const [respuestas, setRespuestas] = useState<string[]>(['', '']);
 
-  // Maneja el envío del formulario
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); // Previene el recargo de la página
+    e.preventDefault();
     const token = localStorage.getItem('token');
     if (!token) return alert('Debes iniciar sesión');
 
     try {
-      // Enviar respuestas al backend
       const res = await responderEvaluacion({ evaluacionId, respuestas }, token);
-      alert(`✅ Puntaje: ${res.puntaje}\n🎖️ Insignia obtenida: ${res.insignias[0]}`);
+      alert(`✅ Puntaje: ${res.puntaje}\n🎖️ Insignia obtenida: ${res.insignia[0]}`);
     } catch (err: any) {
       alert(err.response?.data?.message || 'Error al enviar respuestas');
     }
@@ -24,17 +21,10 @@ export default function ResponderEvaluacion() {
 
   return (
     <div className="bg-gray-100 min-h-screen">
-      {/* Navbar común en toda la app */}
       <Navbar />
-
-      {/* Contenedor central con el formulario */}
       <div className="max-w-xl mx-auto bg-white shadow-md rounded-xl p-8 mt-10">
         <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">📝 Responder Evaluación</h2>
-        
-        {/* Formulario con preguntas fijas (2) */}
         <form onSubmit={handleSubmit} className="space-y-6">
-
-          {/* Campo para ingresar el ID de la evaluación */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">ID de Evaluación</label>
             <input
@@ -46,7 +36,6 @@ export default function ResponderEvaluacion() {
             />
           </div>
 
-          {/* Pregunta 1 */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">Pregunta 1</label>
             <input
@@ -62,7 +51,6 @@ export default function ResponderEvaluacion() {
             />
           </div>
 
-          {/* Pregunta 2 */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">Pregunta 2</label>
             <input
@@ -78,7 +66,6 @@ export default function ResponderEvaluacion() {
             />
           </div>
 
-          {/* Botón para enviar respuestas */}
           <div className="text-center">
             <button
               type="submit"

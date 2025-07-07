@@ -1,23 +1,26 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 
-// Interface que describe la estructura de una capacitación
 interface Capacitacion {
   _id: string;
   titulo: string;
   descripcion: string;
   creador: { username: string };
-  contenido: string; // URL del video
-  videoUrl?: string; // Video asociado
-  miembros?: string[]; // Lista de miembros
+  contenido: string;
+  videoUrl?: string;
+  miembros?: string[];
 }
 
 export default function MisCapacitaciones() {
-  const [misCapacitaciones, setMisCapacitaciones] = useState<Capacitacion[]>([]); // Estado para "Mis capacitaciones"
-  const [cursoSeleccionadoId, setCursoSeleccionadoId] = useState<string | null>(null); // Estado para curso seleccionado
+  const [misCapacitaciones, setMisCapacitaciones] = useState<Capacitacion[]>([]);
+  const [cursoSeleccionadoId, setCursoSeleccionadoId] = useState<string | null>(null);
+  const [videoProgress, setVideoProgress] = useState<number>(0);
+  const [player, setPlayer] = useState<any>(null);
+  const [progresos, setProgresos] = useState<Record<string, number>>({});
+  const navigate = useNavigate();
 
-  // Obtener las "Mis capacitaciones" desde la API
   useEffect(() => {
     const fetchCapacitaciones = async () => {
       try {
@@ -25,14 +28,19 @@ export default function MisCapacitaciones() {
         if (!token) return;
 
         const res = await axios.get('https://plataforma-microlearning-x4bz.onrender.com/api/capacitaciones', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+          headers: { Authorization: `Bearer ${token}` }
         });
 
-        // Establecemos las capacitaciones en las que el usuario está inscrito
-        setMisCapacitaciones(res.data);
+        // Obtener el userId del token (JWT)
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const userId = payload.id;
 
+        // Filtrar capacitaciones donde el usuario esté como miembro
+        const filtradas = res.data.filter((cap: Capacitacion) =>
+          cap.miembros?.includes(userId)
+        );
+
+        setMisCapacitaciones(filtradas);
       } catch (err) {
         console.error('Error al obtener las capacitaciones', err);
       }
@@ -41,39 +49,75 @@ export default function MisCapacitaciones() {
     fetchCapacitaciones();
   }, []);
 
-  // Manejar la visualización del progreso del curso
-  const handleVerProgreso = async (id: string) => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      alert('Debes iniciar sesión para ver el progreso');
-      return;
+  const getYouTubeEmbedUrl = (url: string) => {
+    try {
+      const videoId = new URL(url).searchParams.get('v');
+      return videoId ? `https://www.youtube.com/embed/${videoId}?enablejsapi=1` : '';
+    } catch (error) {
+      console.error('Error al procesar la URL del video:', error);
+      return '';
     }
+  };
+
+  const onPlayerStateChange = (event: any) => {
+    const progress = (event.target.getCurrentTime() / event.target.getDuration()) * 100;
+    setVideoProgress(Math.floor(progress));
+    if (progress === 100) {
+      setTimeout(() => {
+        navigate('/responder');
+      }, 2000);
+    }
+  };
+
+  const updateProgreso = async (cursoId: string, progress: number) => {
+    const token = localStorage.getItem('token');
+    if (!token) return alert('Debes iniciar sesión');
 
     try {
-      const res = await axios.get(
-        `https://plataforma-microlearning-x4bz.onrender.com/api/capacitaciones/${id}/progreso`,
+      await axios.post(
+        `https://plataforma-microlearning-x4bz.onrender.com/api/capacitaciones/${cursoId}/progreso`,
+        { progreso: progress },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      alert(`Tu progreso en esta capacitación es: ${res.data.progreso}%`);
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Error al obtener el progreso');
+      console.log('✅ Progreso actualizado');
+    } catch (err) {
+      console.error('Error al actualizar el progreso', err);
     }
   };
 
-  // Función para convertir la URL de YouTube al formato embed
-  const getYouTubeEmbedUrl = (url: string) => {
-    const videoId = new URL(url).searchParams.get('v');
-    if (videoId) {
-      return `https://www.youtube.com/embed/${videoId}`;
-    }
-    return '';
+  const onYouTubeIframeAPIReady = () => {
+    const selectedCap = misCapacitaciones.find(cap => cap._id === cursoSeleccionadoId);
+    if (!selectedCap?.videoUrl) return;
+
+    const videoId = new URL(selectedCap.videoUrl).searchParams.get('v');
+    if (!videoId) return;
+
+    const newPlayer = new window.YT.Player(`video-${cursoSeleccionadoId}`, {
+      videoId,
+      events: {
+        onStateChange: onPlayerStateChange,
+        onReady: () => console.log('🎬 Reproductor listo'),
+      }
+    });
+    setPlayer(newPlayer);
   };
+
+  useEffect(() => {
+    if (cursoSeleccionadoId) {
+      if (window.YT) {
+        onYouTubeIframeAPIReady();
+      } else {
+        const script = document.createElement('script');
+        script.src = "https://www.youtube.com/iframe_api";
+        script.onload = () => onYouTubeIframeAPIReady();
+        document.body.appendChild(script);
+      }
+    }
+  }, [cursoSeleccionadoId]);
 
   return (
     <div className="bg-gray-100 min-h-screen pb-10">
       <Navbar />
-      
-      {/* Sección de "Mis capacitaciones" */}
       <h2 className="text-3xl font-bold text-center text-gray-800 mt-10 mb-8">
         📚 Mis capacitaciones
       </h2>
@@ -85,12 +129,12 @@ export default function MisCapacitaciones() {
           misCapacitaciones.map((cap) => (
             <div
               key={cap._id}
-              className="bg-white rounded-2xl shadow-md w-full max-w-sm p-6 flex flex-col justify-between transition hover:shadow-lg"
+              className="bg-white rounded-2xl shadow-md w-full max-w-sm p-6 transition hover:shadow-lg flex flex-col"
             >
               <div>
                 <h3
                   className="text-xl font-semibold text-gray-800 mb-2 cursor-pointer"
-                  onClick={() => setCursoSeleccionadoId(cap._id)} // Selecciona el curso cuando se hace clic
+                  onClick={() => setCursoSeleccionadoId(cap._id)}
                 >
                   {cap.titulo}
                 </h3>
@@ -101,27 +145,59 @@ export default function MisCapacitaciones() {
                 <strong>👤 Creado por:</strong> {cap.creador?.username || 'Desconocido'}
               </p>
 
-              <div className="flex justify-between mt-6">
-                {/* Solo el botón de ver progreso */}
+              <div className="flex justify-between mt-4">
                 <button
-                  onClick={() => handleVerProgreso(cap._id)}
+                  onClick={async () => {
+                    setCursoSeleccionadoId(cap._id);
+                    try {
+                      const token = localStorage.getItem('token');
+                      const res = await axios.get(
+                        `https://plataforma-microlearning-x4bz.onrender.com/api/capacitaciones/${cap._id}/progreso`,
+                        { headers: { Authorization: `Bearer ${token}` } }
+                      );
+                      setProgresos(prev => ({ ...prev, [cap._id]: res.data.progreso }));
+                    } catch (err) {
+                      console.error('Error al obtener el progreso del curso', err);
+                      setProgresos(prev => ({ ...prev, [cap._id]: 0 }));
+                    }
+                  }}
                   className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
                 >
                   Ver progreso
                 </button>
               </div>
 
-              {/* Mostrar video solo si el curso seleccionado es este y tiene un videoUrl */}
+              {cursoSeleccionadoId === cap._id && progresos[cap._id] !== undefined && (
+                <p className="mt-2 text-blue-700 font-semibold text-sm">
+                  Progreso del curso: {progresos[cap._id]}%
+                </p>
+              )}
+
               {cursoSeleccionadoId === cap._id && cap.videoUrl && (
                 <div className="mt-4">
                   <iframe
                     width="100%"
                     height="315"
-                    src={getYouTubeEmbedUrl(cap.videoUrl)} // Usamos la URL convertida
+                    id={`video-${cap._id}`}
+                    src={getYouTubeEmbedUrl(cap.videoUrl)}
                     frameBorder="0"
                     allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                   />
+                </div>
+              )}
+
+              {cursoSeleccionadoId === cap._id && (
+                <div className="mt-4">
+                  <p>Progreso del video: {videoProgress}%</p>
+                  {videoProgress === 100 && (
+                    <button
+                      onClick={() => navigate('/responder')}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+                    >
+                      Redirigir a Evaluación
+                    </button>
+                  )}
                 </div>
               )}
             </div>
