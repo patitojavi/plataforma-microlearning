@@ -2,22 +2,19 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Navbar from '@/components/Navbar';
 
-// Interface que describe la estructura de una capacitación
 interface Capacitacion {
   _id: string;
   titulo: string;
   descripcion: string;
   creador: { username: string };
-  contenido: string; // URL del video (ya no la usaremos)
-  videoUrl?: string; // Video asociado (ya no lo utilizaremos)
-  miembros?: string[]; // Lista de miembros
+  miembros?: string[];
 }
 
 export default function Capacitaciones() {
-  const [capacitaciones, setCapacitaciones] = useState<Capacitacion[]>([]); // Estado para "Mis capacitaciones"
-  const [ setCursoSeleccionadoId] = useState<string | null>(null);
+  const [capacitaciones, setCapacitaciones] = useState<Capacitacion[]>([]);
+const [cursoSeleccionadoId, setCursoSeleccionadoId] = useState<string | null>(null);
 
-  // Obtener las capacitaciones desde la API
+
   useEffect(() => {
     const fetchCapacitaciones = async () => {
       try {
@@ -30,13 +27,9 @@ export default function Capacitaciones() {
     fetchCapacitaciones();
   }, []);
 
-  // Manejar la acción de unirse a un curso
   const handleUnirse = async (id: string) => {
     const token = localStorage.getItem('token');
-    if (!token) {
-      alert('Debes iniciar sesión para unirte');
-      return;
-    }
+    if (!token) return alert('Debes iniciar sesión para unirte');
 
     try {
       await axios.post(
@@ -44,34 +37,26 @@ export default function Capacitaciones() {
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      alert('✅ Te has unido correctamente');
       setCursoSeleccionadoId(id);
     } catch (err: any) {
       alert(err.response?.data?.message || 'Error al unirse');
     }
   };
 
-  // Manejar la visualización del progreso del curso
   const handleVerProgreso = async (id: string) => {
     const token = localStorage.getItem('token');
-    if (!token) {
-      alert('Debes iniciar sesión para ver el progreso');
-      return;
-    }
+    if (!token) return alert('Debes iniciar sesión para ver el progreso');
 
     try {
       const res = await axios.get(
         `https://plataforma-microlearning-x4bz.onrender.com/api/capacitaciones/${id}/progreso`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      alert(`Tu progreso en esta capacitación es: ${res.data.progreso}%`);
+      alert(`📊 Tu progreso en esta capacitación es: ${res.data.progreso}%`);
     } catch (err: any) {
       alert(err.response?.data?.message || 'Error al obtener el progreso');
     }
-  };
-
-  // Manejar la selección de un curso
-  const handleSeleccionarCurso = (id: string) => {
-    setCursoSeleccionadoId(id);
   };
 
   return (
@@ -93,7 +78,7 @@ export default function Capacitaciones() {
               <div>
                 <h3
                   className="text-xl font-semibold text-gray-800 mb-2 cursor-pointer"
-                  onClick={() => handleSeleccionarCurso(cap._id)}
+                  onClick={() => setCursoSeleccionadoId(cap._id)}
                 >
                   {cap.titulo}
                 </h3>

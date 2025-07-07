@@ -13,6 +13,12 @@ interface Capacitacion {
   miembros?: string[];
 }
 
+declare global {
+  interface Window {
+    YT: any;
+  }
+}
+
 export default function MisCapacitaciones() {
   const [misCapacitaciones, setMisCapacitaciones] = useState<Capacitacion[]>([]);
   const [cursoSeleccionadoId, setCursoSeleccionadoId] = useState<string | null>(null);
@@ -31,11 +37,9 @@ export default function MisCapacitaciones() {
           headers: { Authorization: `Bearer ${token}` }
         });
 
-        // Obtener el userId del token (JWT)
         const payload = JSON.parse(atob(token.split('.')[1]));
         const userId = payload.id;
 
-        // Filtrar capacitaciones donde el usuario esté como miembro
         const filtradas = res.data.filter((cap: Capacitacion) =>
           cap.miembros?.includes(userId)
         );
@@ -61,8 +65,11 @@ export default function MisCapacitaciones() {
 
   const onPlayerStateChange = (event: any) => {
     const progress = (event.target.getCurrentTime() / event.target.getDuration()) * 100;
-    setVideoProgress(Math.floor(progress));
-    if (progress === 100) {
+    const rounded = Math.floor(progress);
+    setVideoProgress(rounded);
+
+    if (rounded >= 100 && cursoSeleccionadoId) {
+      updateProgreso(cursoSeleccionadoId, 100);
       setTimeout(() => {
         navigate('/responder');
       }, 2000);
@@ -71,7 +78,7 @@ export default function MisCapacitaciones() {
 
   const updateProgreso = async (cursoId: string, progress: number) => {
     const token = localStorage.getItem('token');
-    if (!token) return alert('Debes iniciar sesión');
+    if (!token) return;
 
     try {
       await axios.post(
@@ -104,7 +111,7 @@ export default function MisCapacitaciones() {
 
   useEffect(() => {
     if (cursoSeleccionadoId) {
-      if (window.YT) {
+      if (window.YT && window.YT.Player) {
         onYouTubeIframeAPIReady();
       } else {
         const script = document.createElement('script');

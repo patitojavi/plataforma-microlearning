@@ -9,142 +9,115 @@ import "react-datepicker/dist/react-datepicker.css";
 ChartJS.register(...registerables);
 
 const generateMockData = (type: "dia" | "mes" | "año", date: Date) => {
-    if (type === "dia") {
-        const labels = Array.from({ length: 24 }, (_, i) => `${i}:00`);
-        const values = labels.map(() => Math.floor(Math.random() * 50) + 10);
-        return { labels, values };
-    } else if (type === "mes") {
-        const daysInMonth = new Date(
-            date.getFullYear(),
-            date.getMonth() + 1,
-            0
-        ).getDate();
-        const labels = Array.from({ length: daysInMonth }, (_, i) => `Día ${i + 1}`);
-        const values = labels.map(() => Math.floor(Math.random() * 100) + 20);
-        return { labels, values };
-    } else {
-        const labels = [
-            "Ene", "Feb", "Mar", "Abr", "May", "Jun",
-            "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"
-        ];
-        const values = labels.map(() => Math.floor(Math.random() * 200) + 50);
-        return { labels, values };
-    }
+  if (type === "dia") {
+    const labels = Array.from({ length: 24 }, (_, i) => `${i}:00`);
+    const values = labels.map(() => Math.floor(Math.random() * 50) + 10);
+    return { labels, values };
+  } else if (type === "mes") {
+    const daysInMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+    const labels = Array.from({ length: daysInMonth }, (_, i) => `Día ${i + 1}`);
+    const values = labels.map(() => Math.floor(Math.random() * 100) + 20);
+    return { labels, values };
+  } else {
+    const labels = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+    const values = labels.map(() => Math.floor(Math.random() * 200) + 50);
+    return { labels, values };
+  }
 };
 
 export default function AdminPage() {
-    const [capacitaciones, setCapacitaciones] = useState<Capacitaciones[]>([]);
-    const [loading,] = useState(false);
-    const [activeTab, setActiveTab] = useState<"dia" | "mes" | "año">("dia");
-    const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-    const [selectedCapacitacion, setSelectedCapacitacion] = useState<string>("all");
-    const [chartData, setChartData] = useState<{ labels: string[]; values: number[] } | null>(null);
+  const [listaCapacitaciones, setListaCapacitaciones] = useState<Capacitaciones[]>([]);
+  const [activeTab, setActiveTab] = useState<"dia" | "mes" | "año">("dia");
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [selectedCapacitacion, setSelectedCapacitacion] = useState<string>("all");
+  const [chartData, setChartData] = useState<{ labels: string[]; values: number[] } | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
-    const fetchCourses = async () => {
-        try {
-            const token = localStorage.getItem("token") || "";
-            const capacitaciones = await obtenerCursos(token);
-            console.log("Capacitaciones obtenidas:", capacitaciones);
-            setCapacitaciones(capacitaciones);
-            processChartData(capacitaciones);
-        } catch (error) {
-            console.error("Error al cargar capacitaciones:", error);
-        }
-    };
+  const fetchCourses = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("token") || "";
+      const data = await obtenerCursos(token);
+      setListaCapacitaciones(data);
+      processChartData(data);
+    } catch (error) {
+      console.error("Error al cargar capacitaciones:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const processChartData = (capacitaciones: Capacitaciones[]) => {
-        if (capacitaciones.length === 0) {
-            setChartData(null);
-            return;
-        }
+  const processChartData = (data: Capacitaciones[]) => {
+    if (data.length === 0) {
+      setChartData(null);
+      return;
+    }
 
-        if (!capacitaciones.some(c => c.graficos)) {
-            setChartData(generateMockData(activeTab, selectedDate));
-            return;
-        }
+    const hasData = data.some((c) => c.graficos !== undefined);
+    if (!hasData) {
+      setChartData(generateMockData(activeTab, selectedDate));
+      return;
+    }
 
-        let labels: string[] = [];
-        let values: number[] = [];
+    let labels: string[] = [];
+    let values: number[] = [];
 
-        if (selectedCapacitacion === "all") {
-            // Sumar datos de todos los capacitacion
-            if (activeTab === "dia") {
-                labels = Array.from({ length: 24 }, (_, i) => `${i}:00`);
-                values = labels.map((_, i) =>
-                    capacitaciones.reduce((sum, capacitaciones) => sum + (capacitaciones.graficos.dia[i] || 0), 0)
-                );
-            } else if (activeTab === "mes") {
-                const daysInMonth = new Date(
-                    selectedDate.getFullYear(),
-                    selectedDate.getMonth() + 1,
-                    0
-                ).getDate();
-                labels = Array.from({ length: daysInMonth }, (_, i) => `Día ${i + 1}`);
-                values = labels.map((_, i) =>
-                    capacitaciones.reduce((sum, capacitaciones) => sum + (capacitaciones.graficos.mes[i] || 0), 0)
-                );
-            } else {
-                labels = [
-                    "Ene", "Feb", "Mar", "Abr", "May", "Jun",
-                    "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"
-                ];
-                values = labels.map((_, i) =>
-                    capacitaciones.reduce((sum, capacitaciones) => sum + (capacitaciones.graficos.año[i] || 0), 0)
-                );
-            }
-        } else {
-            // Mostrar datos de un curso específico
-            const capacitaciones = capacitaciones.find(c => c._id === selectedCapacitacion);
-            if (!capacitaciones) return;
+    if (selectedCapacitacion === "all") {
+      if (activeTab === "dia") {
+        labels = Array.from({ length: 24 }, (_, i) => `${i}:00`);
+        values = labels.map((_, i) => data.reduce((sum, c) => sum + (c.graficos?.dia?.[i] || 0), 0));
+      } else if (activeTab === "mes") {
+        const daysInMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0).getDate();
+        labels = Array.from({ length: daysInMonth }, (_, i) => `Día ${i + 1}`);
+        values = labels.map((_, i) => data.reduce((sum, c) => sum + (c.graficos?.mes?.[i] || 0), 0));
+      } else {
+        labels = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+        values = labels.map((_, i) => data.reduce((sum, c) => sum + (c.graficos?.año?.[i] || 0), 0));
+      }
+    } else {
+      const curso = data.find((c) => c._id === selectedCapacitacion);
+      if (!curso || !curso.graficos) return;
 
-            if (activeTab === "dia") {
-                labels = Array.from({ length: 24 }, (_, i) => `${i}:00`);
-                values = capacitaciones.graficos.dia;
-            } else if (activeTab === "mes") {
-                const daysInMonth = new Date(
-                    selectedDate.getFullYear(),
-                    selectedDate.getMonth() + 1,
-                    0
-                ).getDate();
-                labels = Array.from({ length: daysInMonth }, (_, i) => `Día ${i + 1}`);
-                values = capacitaciones.graficos.mes.slice(0, daysInMonth);
-            } else {
-                labels = [
-                    "Ene", "Feb", "Mar", "Abr", "May", "Jun",
-                    "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"
-                ];
-                values = capacitaciones.graficos.año;
-            }
-        }
+      if (activeTab === "dia") {
+        labels = Array.from({ length: 24 }, (_, i) => `${i}:00`);
+        values = curso.graficos.dia;
+      } else if (activeTab === "mes") {
+        const daysInMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0).getDate();
+        labels = Array.from({ length: daysInMonth }, (_, i) => `Día ${i + 1}`);
+        values = curso.graficos.mes.slice(0, daysInMonth);
+      } else {
+        labels = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+        values = curso.graficos.año;
+      }
+    }
 
-        setChartData({ labels, values });
-    };
+    setChartData({ labels, values });
+  };
 
+  useEffect(() => {
+    fetchCourses();
+  }, []);
 
-    useEffect(() => {
-        fetchCourses();
-    }, []);
+  useEffect(() => {
+    if (listaCapacitaciones.length > 0) {
+      processChartData(listaCapacitaciones);
+    }
+  }, [activeTab, selectedDate, selectedCapacitacion]);
 
-    useEffect(() => {
-        if (capacitaciones.length > 0) {
-            processChartData(capacitaciones);
-        }
-    }, [activeTab, selectedDate, selectedCapacitacion]);
+  const getChartTitle = () => {
+    if (selectedCapacitacion === "all") {
+      return `Estadísticas ${activeTab === "dia" ? "del día" : activeTab === "mes" ? "del mes" : "del año"} - Todas las capacitaciones`;
+    } else {
+      const curso = listaCapacitaciones.find((c) => c._id === selectedCapacitacion);
+      return `Estadísticas ${activeTab === "dia" ? "del día" : activeTab === "mes" ? "del mes" : "del año"} - ${curso?.titulo || ""}`;
+    }
+  };
 
-    const getChartTitle = () => {
-        if (selectedCapacitacion === "all") {
-            return `Estadísticas ${activeTab === "dia" ? "del día" : activeTab === "mes" ? "del mes" : "del año"} - Todas las capacitaciones`;
-        } else {
-            const capacitaciones = capacitaciones.find(c => c._id === selectedCapacitacion);
-            return `Estadísticas ${activeTab === "dia" ? "del día" : activeTab === "mes" ? "del mes" : "del año"} - ${capacitaciones?.titulo || ""}`;
-        }
-    };
-
-    const colors = {
-        dia: { bg: "rgba(54, 162, 235, 0.5)", border: "rgba(54, 162, 235, 1)" },
-        mes: { bg: "rgba(75, 192, 192, 0.5)", border: "rgba(75, 192, 192, 1)" },
-        año: { bg: "rgba(153, 102, 255, 0.5)", border: "rgba(153, 102, 255, 1)" }
-    };
+  const colors = {
+    dia: { bg: "rgba(54, 162, 235, 0.5)", border: "rgba(54, 162, 235, 1)" },
+    mes: { bg: "rgba(75, 192, 192, 0.5)", border: "rgba(75, 192, 192, 1)" },
+    año: { bg: "rgba(153, 102, 255, 0.5)", border: "rgba(153, 102, 255, 1)" }
+  };
     return (
         <div>
             <AppNavbar />
