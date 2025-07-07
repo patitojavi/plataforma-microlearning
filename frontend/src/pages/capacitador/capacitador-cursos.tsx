@@ -101,7 +101,7 @@ export default function CapacitadorCursos() {
         try {
             const token = localStorage.getItem("token") || "";
             const updatedContenido = selectedCapacitacion.contenido.filter(
-                item => item.titulo !== titulo
+                item => item.split('|')[0] !== titulo
             );
 
             const updatedCapacitacion = {
